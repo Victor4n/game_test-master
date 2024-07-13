@@ -1,0 +1,61 @@
+/* Estilos para la página de personalización */
+
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: rgb(5, 5, 53);
+    color: #fff;
+  }
+  
+  .contenedor {
+    display: flex;
+    height: 100vh;
+    background-color: rgb(5, 5, 53);
+    color: #fff;
+  }
+  
+  .mitad-izquierda, .mitad-derecha {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mitad-izquierda {
+    background-color: rgb(15, 15, 44);
+    color: #fff; /* Color de fondo para la mitad izquierda (puedes ajustarlo según tus necesidades) */
+  }
+  
+  .mitad-derecha {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px;
+  }
+  
+  .tarjeta {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  
+  button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  .equipado {
+    color: green; /* Cambia a tu color verde deseado */
+}
+
+.no-equipado {
+    color: red; /* Cambia a tu color rojo deseado */
+}

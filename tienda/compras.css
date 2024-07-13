@@ -1,0 +1,19 @@
+body{
+    background-color: rgb(5, 5, 53);
+    color: #fff;
+}
+
+.tarjeta {
+    text-align: center;
+    margin: 10px; /* Ajusta el margen según sea necesario */
+    padding: 10px; /* Ajusta el relleno según sea necesario */
+    border: 1px solid #ccc; /* Añade un borde para mayor claridad */
+  }
+  
+  /* Estilo específico para la imagen dentro de la tarjeta */
+  .tarjeta img {
+    max-width: 20%; /* La imagen no debe rebasar el ancho de su contenedor */
+    height: auto; /* Mantiene la proporción de la imagen */
+    display: block; /* Elimina el espacio adicional debajo de la imagen */
+    margin: 0 auto; /* Centra la imagen horizontalmente */
+  }

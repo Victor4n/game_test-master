@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Perfil</title>
+  <link rel="stylesheet" href="perfilEdicion.css">
+  <style>
+    /* Agrega estilos según tus preferencias */
+    
+  </style>
+</head>
+<body>
+  <h1>Editar Perfil</h1>
+
+  <form id="formularioPerfil">
+    <label for="nombreUsuario">Nombre de Usuario:</label>
+    <input type="text" id="nombreUsuario" required>
+
+    <label for="fotoPerfil">Foto de Perfil:</label>
+    <input type="file" id="fotoPerfil" accept="image/*">
+
+    <img id="imagenPrevia" alt="Vista previa de la foto de perfil">
+
+    <button type="submit">Guardar Cambios</button>
+  </form>
+  <a href="../index.html">Atrás</a>
+  <script src="perfilEdicion.js"></script>
+</body>
+</html>

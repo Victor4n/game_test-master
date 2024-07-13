@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Piedra, Papel o Tijera Online</title>
+  <link rel="stylesheet" href="/play/index.css">
+</head>
+<body>
+  <div class="contenedor">
+    <div id="imagenBienvenida"></div>
+    <div id="mensajeBienvenida"></div>
+    <p id="nombreArtefactoEquipado">Artefacto Equipado: <img id="imagenArtefacto" src="" alt="Ninguno" width="60" height="50"></p>
+
+
+    <h1>Piedra, Papel o Tijera Online</h1>
+    <button onclick="elegir('piedra')">Piedra</button>
+    <button onclick="elegir('papel')">Papel</button>
+    <button onclick="elegir('tijera')">Tijera</button>
+    <p id="resultado"></p>
+    <div id="puntaje">Puntaje: <span id="puntos"></span></div>
+    <div id="opciones">
+      <button onclick="establecerPuntos(10)">10 puntos</button>
+      <button onclick="establecerPuntos(20)">20 puntos</button>
+      <button onclick="establecerPuntos(50)">50 puntos</button>
+      <button onclick="establecerPuntos(100)">100 puntos</button>
+      <button onclick="establecerPuntos(200)">200 puntos</button>
+    </div>
+    <button onclick="ganarPuntos()">Ganar 100 puntos</button>
+    <button onclick="mostrarEstadisticas()">Ver Estadísticas</button>
+    <div id="contador"></div>
+    <a href="../index.html">Atrás</a>
+  </div>
+
+  <script src="/play/index.js"></script>
+</body>
+</html>
+
