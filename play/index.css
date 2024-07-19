@@ -1,32 +1,136 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+    /* ... (mantener los estilos existentes) ... */
+    padding-bottom: 100px; /* Añadir espacio para los botones inferiores */
+}
+
+.contenedor {
+    /* ... (mantener los estilos existentes) ... */
+    margin-bottom: 120px; /* Aumentar el margen inferior */
+}
+
+/* Nuevo estilo para los botones de Piedra, Papel, Tijera */
+.inferior {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f0f0f0;
-    flex-direction: column;
-    position: relative; /* Añade esta línea */
-    min-height: 100vh; /* Añade esta línea */
+    gap: 10px;
+    padding: 0 10px;
   }
-
-  .contenedor {
-    margin-bottom: 60px; /* Añade esta línea */
-    text-align: center;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+  
+  .btn-opcion {
+    width: 80px;
+    height: 80px;
+    cursor: grab;
+    transition: transform 0.3s ease;
     position: relative;
+    touch-action: none;
+  }
+  
+  .btn-opcion img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+  }
+  
+  .btn-opcion.dragging {
+    cursor: grabbing;
+    z-index: 1000;
+  }
+  
+  .release-indicator {
+  display: none;
+  position: absolute;
+  bottom: 100%; /* Cambiado de top a bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  color: #ff0000;
+  margin-bottom: 5px; /* Añadido para separar un poco del botón */
+}
+  
+  .btn-opcion.ready-to-release .release-indicator {
+    display: block;
   }
 
-  h1 {
+/*POP UP*/
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
+  
+  .popup-contenido {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+  }
+  
+  .popup-contenido button {
+    margin: 5px;
+    padding: 10px 15px;
+  }
+
+.btn-opcion {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 80px;
+    height: 80px;
+}
+
+.btn-opcion img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Ajustes para responsividad */
+@media (max-width: 360px) {
+    .contenedor {
+        width: 95%;
+        padding: 15px;
+        margin-bottom: 100px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .btn-opcion {
+        width: 70px;
+        height: 70px;
+    }
+
+    .inferior {
+        bottom: 10px;
+    }
+
+    .inferior-izquierda a {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+}
+
+h1 {
     margin-bottom: 20px;
-  }
+}
 
-  button {
+button {
     padding: 15px 25px;
     font-size: 16px;
     margin: 10px;
@@ -35,27 +139,27 @@ body {
     border-radius: 5px;
     background-color: #007bff;
     color: white;
-  }
+}
 
-  button:disabled {
+button:disabled {
     background-color: #ccc;
-  }
+}
 
-  #nombreArtefactoEquipado {
+#nombreArtefactoEquipado {
     margin-bottom: 20px;
-  }
+}
 
-  #imagenArtefacto {
+#imagenArtefacto {
     margin-left: 10px;
     vertical-align: middle;
-  }
+}
 
-  #resultado, #contador {
+#resultado, #contador {
     margin-top: 20px;
     font-size: 18px;
-  }
+}
 
-  a {
+a {
     display: block;
     margin-top: 30px;
     text-decoration: none;
@@ -64,88 +168,142 @@ body {
     padding: 10px 15px;
     font-size: 18px;
     border-radius: 10px;
-  }
+}
 
-  .superior-izquierda, .superior-derecha, .inferior-izquierda {
+.superior-izquierda, .superior-derecha, .inferior-izquierda {
     position: absolute;
     padding: 10px;
-  }
+}
 
-  .superior-izquierda {
+.superior-izquierda {
     top: 10px;
     left: 10px;
     display: flex;
     align-items: center;
-  }
+}
 
-  .superior-izquierda img {
+.superior-izquierda img {
     border-radius: 50%;
     margin-right: 10px;
-  }
+}
 
-  .superior-derecha {
+.superior-derecha {
     top: 10px;
     right: 10px;
-  }
+}
 
-  .inferior-izquierda {
+.inferior-izquierda {
     bottom: 10px;
     left: 10px;
-  }
+}
 
-  .inferior-derecha {
+.inferior-derecha {
     position: fixed;
     bottom: 20px;
     right: 20px;
     z-index: 1000;
-  }
+}
 
-  .puntaje {
+.puntaje {
     text-align: center;
     margin-top: 10px;
-  }
+}
 
-  .puntaje span {
+.puntaje span {
     display: block;
     font-size: 36px;
     font-weight: bold;
     margin-top: 5px;
-  }
+}
 
-  .experiencia {
+.experiencia {
     margin-top: 10px;
     text-align: center;
-  }
+}
 
-  .barra-experiencia {
+.barra-experiencia {
     width: 80%;
     height: 20px;
     background-color: #e0e0e0;
     border-radius: 10px;
     overflow: hidden;
     margin: 10px auto;
-  }
+}
 
-  .barra-experiencia-inner {
+.barra-experiencia-inner {
     height: 100%;
     background-color: #76c7c0;
     width: 0;
     border-radius: 10px 0 0 10px;
-  }
-
-  .boton-ganar-puntos {
-    background-color: #28a745; /* Un color diferente para distinguirlo */
-    padding: 10px 15px; /* Ajusta el tamaño según necesites */
-    font-size: 14px; /* Ajusta el tamaño de la fuente */
 }
 
-  @media (max-width: 600px) {
+.boton-ganar-puntos {
+    background-color: #28a745;
+    padding: 10px 15px;
+    font-size: 14px;
+}
+
+/* Nuevo estilo para los botones de Piedra, Papel, Tijera */
+#opcionesJuego {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+#opcionesJuego button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+#opcionesJuego img {
+    width: 50px;
+    height: 50px;
+}
+
+/* Estilo para los botones de puntos */
+#opcionesPuntos {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#opcionesPuntos button {
+    margin: 5px;
+    padding: 10px 15px;
+    font-size: 14px;
+}
+
+/* Responsividad */
+@media (max-width: 600px) {
     button {
-      width: 100%;
-      margin: 5px 0;
+        width: 100%;
+        margin: 5px 0;
     }
 
     .superior-izquierda, .superior-derecha, .inferior-izquierda, .inferior-derecha {
-      padding: 5px;
+        padding: 5px;
     }
-  }
+    
+    #opcionesJuego {
+        bottom: 10px;
+    }
+
+    #opcionesJuego img {
+        width: 40px;
+        height: 40px;
+    }
+
+    #opcionesPuntos {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #opcionesPuntos button {
+        margin: 5px 0;
+    }
+}

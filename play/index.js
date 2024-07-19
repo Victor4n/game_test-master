@@ -1,14 +1,155 @@
+function abrirPopupPuntos() {
+  document.getElementById("popupPuntos").style.display = "block";
+}
 
+function cerrarPopupPuntos() {
+  document.getElementById("popupPuntos").style.display = "none";
+}
 
+function establecerPuntos(puntos) {
+  alert("Estás jugando por " + puntos + " puntos");
+  cerrarPopupPuntos();
+  // Aquí puedes agregar la lógica adicional para establecer los puntos en el juego
+}
+
+// Cerrar el popup si se hace clic fuera de él
+window.onclick = function(event) {
+  if (event.target == document.getElementById("popupPuntos")) {
+    cerrarPopupPuntos();
+  }
+}
 let puntaje = parseInt(localStorage.getItem('puntaje'), 10) || 0;
-let puntosPartida = 10; // Puntos por defecto
-let temporizador;
+let puntosPartida = 10;
 let nombreJugador = obtenerNombreUsuario();
-
 let experiencia = parseInt(localStorage.getItem('experiencia'), 10) || 0;
 let nivel = parseInt(localStorage.getItem('nivel'), 10) || 1;
 const experienciaPorNivel = 100;
 
+document.addEventListener('DOMContentLoaded', function() {
+  const botones = document.querySelectorAll('.btn-opcion');
+  botones.forEach(boton => {
+    boton.addEventListener('mousedown', iniciarArrastre);
+    boton.addEventListener('touchstart', iniciarArrastre, { passive: false });
+    
+    // Añadir el indicador de liberación
+    const indicator = document.createElement('span');
+    indicator.className = 'release-indicator';
+    indicator.textContent = '(x)';
+    boton.appendChild(indicator);
+  });
+
+  document.addEventListener('mousemove', moverElemento);
+  document.addEventListener('touchmove', moverElemento, { passive: false });
+  document.addEventListener('mouseup', soltarElemento);
+  document.addEventListener('touchend', soltarElemento);
+
+  actualizarPuntaje();
+  cargarArtefactoEquipado();
+  actualizarBarraExperiencia();
+  actualizarClasificaciones();
+  cargarImagenPerfil();
+});
+
+let elementoArrastrado = null;
+let offsetX, offsetY;
+let posicionInicialX, posicionInicialY;
+
+function iniciarArrastre(e) {
+  elementoArrastrado = this;
+  const rect = elementoArrastrado.getBoundingClientRect();
+  
+  if (e.type === 'mousedown') {
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+  } else if (e.type === 'touchstart') {
+    offsetX = e.touches[0].clientX - rect.left;
+    offsetY = e.touches[0].clientY - rect.top;
+  }
+
+  posicionInicialX = rect.left;
+  posicionInicialY = rect.top;
+
+  elementoArrastrado.style.position = 'fixed';
+  elementoArrastrado.style.left = `${posicionInicialX}px`;
+  elementoArrastrado.style.top = `${posicionInicialY}px`;
+  elementoArrastrado.classList.add('dragging');
+  
+  e.preventDefault();
+}
+
+function moverElemento(e) {
+  if (!elementoArrastrado) return;
+
+  let clientX, clientY;
+  if (e.type === 'mousemove') {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  } else if (e.type === 'touchmove') {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  }
+
+  const newX = clientX - offsetX;
+  const newY = clientY - offsetY;
+
+  elementoArrastrado.style.left = `${newX}px`;
+  elementoArrastrado.style.top = `${newY}px`;
+
+  // Verificar si el elemento ha sido arrastrado lo suficiente verticalmente
+  const windowHeight = window.innerHeight;
+  const dragThreshold = windowHeight * 0.85; // 3/4 de la altura de la pantalla desde abajo
+
+  if (newY < dragThreshold) {
+    elementoArrastrado.classList.add('ready-to-release');
+  } else {
+    elementoArrastrado.classList.remove('ready-to-release');
+  }
+
+  e.preventDefault();
+}
+
+function soltarElemento(e) {
+  if (!elementoArrastrado) return;
+
+  const rect = elementoArrastrado.getBoundingClientRect();
+  const centerY = rect.top + rect.height / 2;
+  const windowHeight = window.innerHeight;
+  const releaseThreshold = windowHeight * 0.85; // 3/4 de la altura de la pantalla desde abajo
+
+  if (centerY < releaseThreshold) {
+    const opcion = elementoArrastrado.getAttribute('data-opcion');
+    elegir(opcion);
+  }
+
+  // Restaurar la posición original
+  elementoArrastrado.style.position = '';
+  elementoArrastrado.style.left = '';
+  elementoArrastrado.style.top = '';
+  elementoArrastrado.classList.remove('dragging');
+  elementoArrastrado.classList.remove('ready-to-release');
+  elementoArrastrado = null;
+}
+
+function elegir(eleccionJugador) {
+  if (puntaje < puntosPartida) {
+    alert("No tienes suficientes puntos para jugar por esta cantidad.");
+    return;
+  }
+
+  const nombreMaquina = generarNombreAleatorio();
+  const eleccionMaquina = generarEleccionAleatoria();
+
+  const resultado = determinarGanador(eleccionJugador, eleccionMaquina);
+
+  document.getElementById('resultado').innerText = `${nombreJugador} escogió ${eleccionJugador}. ${nombreMaquina} escogió ${eleccionMaquina}. ${resultado}`;
+
+  actualizarPuntaje(resultado);
+  actualizarExperiencia(resultado);
+  actualizarPuntajeBot(nombreMaquina, resultado.includes('Ganaste') ? 'perdida' : resultado.includes('Perdiste') ? 'ganada' : 'empatada');
+  actualizarClasificaciones();
+}
+
+// ... (el resto de las funciones permanecen igual)
 // Inicializa las estadísticas del usuario si no existen
 let estadisticas = JSON.parse(localStorage.getItem('estadisticas')) || { ganadas: 0, perdidas: 0, empatadas: 0 };
 

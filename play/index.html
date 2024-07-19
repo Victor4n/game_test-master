@@ -7,57 +7,59 @@
   <link rel="stylesheet" href="/play/index.css">
 </head>
 <body>
-    <div class="superior-izquierda">
-      <img src="" id="imagenPerfil" width="50" height="50" alt="Imagen Perfil">
-      <span id="nombreJugador">Jugador</span>
-    </div>
-  
-    <div class="superior-derecha">
-      <button onclick="mostrarEstadisticas()">Ver Estadísticas</button>
-    </div>
-  
-    <div class="puntaje">
-      Puntaje:
-      <span id="puntos"></span>
-    </div>
-  
-    <div class="experiencia">
-      Nivel: <span id="nivel"></span>
-      <div class="barra-experiencia">
-        <div class="barra-experiencia-inner" id="barraExperiencia"></div>
-      </div>
-      <span id="experienciaActual"></span> / <span id="experienciaMaxima"></span>
-    </div>
-  
-    <div class="contenedor">
-      <div id="imagenBienvenida"></div>
-      <div id="mensajeBienvenida"></div>
-      <p id="nombreArtefactoEquipado">Artefacto Equipado: <img id="imagenArtefacto" src="" alt="Ninguno" width="60" height="50"></p>
-  
-      <h1>Piedra, Papel o Tijera Online</h1>
-      <button onclick="elegir('piedra')">Piedra</button>
-      <button onclick="elegir('papel')">Papel</button>
-      <button onclick="elegir('tijera')">Tijera</button>
-      <p id="resultado"></p>
-      <div id="opciones">
-        <button onclick="establecerPuntos(10)">10 puntos</button>
-        <button onclick="establecerPuntos(20)">20 puntos</button>
-        <button onclick="establecerPuntos(50)">50 puntos</button>
-        <button onclick="establecerPuntos(100)">100 puntos</button>
-        <button onclick="establecerPuntos(200)">200 puntos</button>
-      </div>
-      <button onclick="ganarPuntos()" class="inferior-derecha boton-ganar-puntos" id="contador">Ganar 100 puntos</button>
-    </div>
-  
-    <div class="inferior-izquierda">
-      <a href="../index.html">Atrás</a>
-    </div>
-  
-    <script src="index.js"></script>
-    <script type="module" src="../js/misionesIntegracion.js"></script>
-  </body>
-  </html>
+  <div class="superior-izquierda">
+    <img src="" id="imagenPerfil" width="50" height="50" alt="Imagen Perfil">
+    <span id="nombreJugador">Jugador</span>
+  </div>
 
+  <div class="puntaje">
+    Puntaje:
+    <span id="puntos"></span>
+  </div>
 
+  <div class="experiencia">
+    Nivel: <span id="nivel"></span>
+    <div class="barra-experiencia">
+      <div class="barra-experiencia-inner" id="barraExperiencia"></div>
+    </div>
+    <span id="experienciaActual"></span> / <span id="experienciaMaxima"></span>
+  </div>
 
+  <div class="contenedor">
+    <div id="imagenBienvenida"></div>
+    <div id="mensajeBienvenida"></div>
+    <p id="nombreArtefactoEquipado">Artefacto Equipado: <img id="imagenArtefacto" src="" alt="Ninguno" width="60" height="50"></p>
+
+    <h1>Piedra, Papel o Tijera Online</h1>
+    <p id="resultado"></p>
+    <button onclick="abrirPopupPuntos()">Cantidades a jugar</button>
+    <button onclick="ganarPuntos()" class="boton-ganar-puntos" id="contador">Ganar 100 puntos</button>
+  </div>
+
+  <div id="popupPuntos" class="popup">
+    <div class="popup-contenido">
+      <h2>Selecciona la cantidad de puntos</h2>
+      <button onclick="establecerPuntos(10)">10 puntos</button>
+      <button onclick="establecerPuntos(20)">20 puntos</button>
+      <button onclick="establecerPuntos(50)">50 puntos</button>
+      <button onclick="establecerPuntos(100)">100 puntos</button>
+      <button onclick="establecerPuntos(200)">200 puntos</button>
+      <button onclick="cerrarPopupPuntos()">Cerrar</button>
+    </div>
+  </div>
+
+  <div class="inferior" id="opcionesJuego">
+    <div class="btn-opcion" data-opcion="piedra"><img src="https://png.pngtree.com/png-clipart/20231019/original/pngtree-illustration-of-a-stone-with-a-cartoon-style-png-image_13358278.png" alt="Piedra"></div>
+    <div class="btn-opcion" data-opcion="papel"><img src="https://png.pngtree.com/png-clipart/20210312/original/pngtree-hand-drawn-cartoon-piece-of-paper-png-image_6070901.jpg" alt="Papel"></div>
+    <div class="btn-opcion" data-opcion="tijera"><img src="https://creazilla-store.fra1.digitaloceanspaces.com/emojis/53124/scissors-emoji-clipart-md.png" alt="Tijera"></div>
+  </div>
+
+  <div class="inferior-izquierda">
+    <a href="../index.html">Atrás</a>
+  </div>
+
+  <script src="index.js"></script>
+  <script type="module" src="../js/misionesIntegracion.js"></script>
+</body>
+</html>
 
