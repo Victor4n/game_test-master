@@ -7,7 +7,6 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    flex-direction: column;
 }
 
 .container {
@@ -21,43 +20,35 @@ h1 {
     margin-bottom: 20px;
 }
 
-#contenedorArtefactos {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+#contenedorLogros {
+    list-style: none;
+    padding: 0;
 }
 
-.artefacto {
+.logro {
     background: rgb(15, 15, 44);
     padding: 15px;
-    margin: 10px;
+    margin: 10px 0;
     border-radius: 8px;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    width: 120px;
 }
 
-.artefacto img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    margin-bottom: 10px;
+.logro span {
+    flex-grow: 1;
+    text-align: left;
+    margin-left: 15px;
 }
 
-.artefacto button {
+.logro-obtenido {
     background-color: #4caf50;
     color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
-.artefacto button[disabled] {
-    background-color: grey;
-    cursor: not-allowed;
+.logro-no-obtenido {
+    background-color: #f44336;
+    color: white;
 }
 
 .inferior-izquierda {

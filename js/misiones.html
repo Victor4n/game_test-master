@@ -1,0 +1,40 @@
+<!-- misiones.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misiones Diarias</title>
+    <link rel="stylesheet" href="misiones.css">
+</head>
+<body>
+    <h1>Misiones Diarias</h1>
+    <div id="misiones">
+        <div>
+            <h2>Misión 1: Ganar 10 partidas</h2>
+            <p>Progreso: <span id="victoriasMision"></span></p>
+            <p>Recompensa: 30 puntos</p>
+        </div>
+        <div>
+            <h2>Misión 2: Ganar 5 partidas seguidas</h2>
+            <p>Progreso: <span id="victoriasConsecutivasMision"></span></p>
+            <p>Recompensa: 30 puntos</p>
+        </div>
+        <div>
+            <h2>Misión 3: Jugar durante 30 minutos</h2>
+            <p>Progreso: <span id="tiempoJugadoMision"></span></p>
+            <p>Recompensa: 30 puntos</p>
+        </div>
+    </div>
+
+    <script type="module" src="misiones.js"></script>
+    <script type="module" src="misionesUI.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            mostrarMisiones(); // Mostrar misiones al cargar la página
+        });
+    </script>
+</body>
+</html>
+

@@ -1,68 +1,219 @@
-body {
+body, html {
     margin: 0;
     padding: 0;
+    height: 100%;
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
-  }
-  
-  #menu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-  
-  h1 {
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-  .boton {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 10px;
-    font-size: 16px;
+}
+
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+.title{
     text-align: center;
-    text-decoration: none;
-    background-color: #3498db;
-    color: #fff;
-    border-radius: 5px;
+    margin-top: 60px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+.player-profile {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 80px;
+    text-align: center;
     cursor: pointer;
-  }
-  
-  #jugarAhora {
-    background-color: #2ecc71;
-  }
-  
-  /* Estilos para el overlay de carga */
-  .overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
+}
+
+.player-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 5px;
+    border: 2px solid #333;
+}
+
+.player-avatar img {
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.8);
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+    object-fit: cover;
+}
+
+.player-name {
+    margin: 0;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.achievements {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+}
+
+.achievements img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+h1 {
     text-align: center;
-    z-index: 9999;
-  }
-  
-  .spinner {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #3498db;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
+    margin-top: 60px;
+}
+
+.button {
+    display: block;
+    width: 100%;
+    padding: 15px;
     margin-bottom: 10px;
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+
+/*perfil jugador esquinado*/
+#jugar { background-color: #4CAF50; }
+#inventario { background-color: #f44336; }
+#tienda { background-color: #3f51b5; }
+#clasificaciones { background-color: #ffeb3b; color: #333; }
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    .player-profile {
+        width: 60px;
+    }
+
+    .player-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .player-name {
+        font-size: 12px;
+    }
+
+    .achievements {
+        width: 60px;
+        height: 60px;
+    }
+
+    h1 {
+        font-size: 24px;
+        margin-top: 50px;
+    }
+
+    .button {
+        font-size: 16px;
+        padding: 12px;
+    }
+}
+
+/*aqui termina xd*/
+
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.titulo {
+    font-size: 2.5em;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1 / 1.2;
+}
+
+.menu-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+.jugar {
+    grid-column: 1 / 3;
+    background-color: #4CAF50;
+    height: 100px; /* Altura reducida */
+}
+
+.inventario {
+    background-color: #f44336;
+}
+
+.tienda {
+    background-color: #3f51b5;
+}
+
+.clasificaciones {
+    grid-column: 1 / 3;
+    background-color: #ffeb3b;
+    color: black;
+}
+
+@media (max-width: 480px) {
+    .titulo {
+        font-size: 2em;
+    }
+
+    .menu-grid {
+        aspect-ratio: 1 / 1.3;
+    }
+    
+    .menu-item {
+        font-size: 1em;
+    }
+
+    .jugar {
+        height: 80px; /* Altura aún más reducida para móviles */
+    }
+}

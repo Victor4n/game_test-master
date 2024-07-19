@@ -7,32 +7,57 @@
   <link rel="stylesheet" href="/play/index.css">
 </head>
 <body>
-  <div class="contenedor">
-    <div id="imagenBienvenida"></div>
-    <div id="mensajeBienvenida"></div>
-    <p id="nombreArtefactoEquipado">Artefacto Equipado: <img id="imagenArtefacto" src="" alt="Ninguno" width="60" height="50"></p>
-
-
-    <h1>Piedra, Papel o Tijera Online</h1>
-    <button onclick="elegir('piedra')">Piedra</button>
-    <button onclick="elegir('papel')">Papel</button>
-    <button onclick="elegir('tijera')">Tijera</button>
-    <p id="resultado"></p>
-    <div id="puntaje">Puntaje: <span id="puntos"></span></div>
-    <div id="opciones">
-      <button onclick="establecerPuntos(10)">10 puntos</button>
-      <button onclick="establecerPuntos(20)">20 puntos</button>
-      <button onclick="establecerPuntos(50)">50 puntos</button>
-      <button onclick="establecerPuntos(100)">100 puntos</button>
-      <button onclick="establecerPuntos(200)">200 puntos</button>
+    <div class="superior-izquierda">
+      <img src="" id="imagenPerfil" width="50" height="50" alt="Imagen Perfil">
+      <span id="nombreJugador">Jugador</span>
     </div>
-    <button onclick="ganarPuntos()">Ganar 100 puntos</button>
-    <button onclick="mostrarEstadisticas()">Ver Estadísticas</button>
-    <div id="contador"></div>
-    <a href="../index.html">Atrás</a>
-  </div>
+  
+    <div class="superior-derecha">
+      <button onclick="mostrarEstadisticas()">Ver Estadísticas</button>
+    </div>
+  
+    <div class="puntaje">
+      Puntaje:
+      <span id="puntos"></span>
+    </div>
+  
+    <div class="experiencia">
+      Nivel: <span id="nivel"></span>
+      <div class="barra-experiencia">
+        <div class="barra-experiencia-inner" id="barraExperiencia"></div>
+      </div>
+      <span id="experienciaActual"></span> / <span id="experienciaMaxima"></span>
+    </div>
+  
+    <div class="contenedor">
+      <div id="imagenBienvenida"></div>
+      <div id="mensajeBienvenida"></div>
+      <p id="nombreArtefactoEquipado">Artefacto Equipado: <img id="imagenArtefacto" src="" alt="Ninguno" width="60" height="50"></p>
+  
+      <h1>Piedra, Papel o Tijera Online</h1>
+      <button onclick="elegir('piedra')">Piedra</button>
+      <button onclick="elegir('papel')">Papel</button>
+      <button onclick="elegir('tijera')">Tijera</button>
+      <p id="resultado"></p>
+      <div id="opciones">
+        <button onclick="establecerPuntos(10)">10 puntos</button>
+        <button onclick="establecerPuntos(20)">20 puntos</button>
+        <button onclick="establecerPuntos(50)">50 puntos</button>
+        <button onclick="establecerPuntos(100)">100 puntos</button>
+        <button onclick="establecerPuntos(200)">200 puntos</button>
+      </div>
+      <button onclick="ganarPuntos()" class="inferior-derecha boton-ganar-puntos" id="contador">Ganar 100 puntos</button>
+    </div>
+  
+    <div class="inferior-izquierda">
+      <a href="../index.html">Atrás</a>
+    </div>
+  
+    <script src="index.js"></script>
+    <script type="module" src="../js/misionesIntegracion.js"></script>
+  </body>
+  </html>
 
-  <script src="/play/index.js"></script>
-</body>
-</html>
+
+
 

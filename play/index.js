@@ -1,44 +1,148 @@
 
-let puntaje = parseInt(localStorage.getItem('puntaje'), 10) || 0; // Inicializamos el puntaje
+
+let puntaje = parseInt(localStorage.getItem('puntaje'), 10) || 0;
 let puntosPartida = 10; // Puntos por defecto
 let temporizador;
 let nombreJugador = obtenerNombreUsuario();
 
+let experiencia = parseInt(localStorage.getItem('experiencia'), 10) || 0;
+let nivel = parseInt(localStorage.getItem('nivel'), 10) || 1;
+const experienciaPorNivel = 100;
+
 // Inicializa las estadísticas del usuario si no existen
 let estadisticas = JSON.parse(localStorage.getItem('estadisticas')) || { ganadas: 0, perdidas: 0, empatadas: 0 };
+
+// Inicializa el progreso de los logros si no existe
+let progresoLogros = JSON.parse(localStorage.getItem('progresoLogros')) || { victorias: 0, victoriasConsecutivas: 0 };
 
 function actualizarEstadisticas(resultado) {
     if (resultado === 'ganada') {
         estadisticas.ganadas++;
+        progresoLogros.victorias++;
+        progresoLogros.victoriasConsecutivas++;
+        // Verifica y guarda logros si es necesario
+        guardarLogros();
     } else if (resultado === 'perdida') {
         estadisticas.perdidas++;
+        progresoLogros.victoriasConsecutivas = 0; // Resetea las victorias consecutivas al perder
     } else if (resultado === 'empatada') {
         estadisticas.empatadas++;
     }
     localStorage.setItem('estadisticas', JSON.stringify(estadisticas));
+    localStorage.setItem('progresoLogros', JSON.stringify(progresoLogros));
 }
 
 function mostrarEstadisticas() {
     alert(`Partidas ganadas: ${estadisticas.ganadas}\nPartidas perdidas: ${estadisticas.perdidas}\nPartidas empatadas: ${estadisticas.empatadas}`);
 }
 
-function generarNombreAleatorio() {
-    const consonantes = 'bcdfghjklmnpqrstvwxyz';
-    const vocales = 'aeiou';
-    const longitudNombre = 7;
-
-    function letraAleatoria(cadena) {
-        return cadena[Math.floor(Math.random() * cadena.length)];
-    }
-
-    let nombre = letraAleatoria(consonantes).toUpperCase();
-    for (let i = 1; i < longitudNombre; i++) {
-        nombre += (i % 2 === 0) ? letraAleatoria(vocales) : letraAleatoria(consonantes);
-    }
-
-    return nombre;
+function obtenerBots() {
+    return [
+        { nombre: 'Byte Bromista', imagen: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Chispa Cibernética', imagen: 'https://images.pexels.com/photos/157661/young-woman-shooting-model-157661.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Risueño Robot', imagen: 'https://images.pexels.com/photos/935969/pexels-photo-935969.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bit Alegre', imagen: 'https://images.pexels.com/photos/2412691/pexels-photo-2412691.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Código Chispeante', imagen: 'https://images.pexels.com/photos/1205716/pexels-photo-1205716.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Tecno Travesura', imagen: 'https://images.pexels.com/photos/1089038/pexels-photo-1089038.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Ráfaga Risueña', imagen: 'https://images.pexels.com/photos/13081260/pexels-photo-13081260.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Circuit Sonrisa', imagen: 'https://images.pexels.com/photos/13326901/pexels-photo-13326901.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bytes Divertidos', imagen: 'https://images.pexels.com/photos/3483800/pexels-photo-3483800.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Circuit Sonrisa', imagen: 'https://images.pexels.com/photos/3483800/pexels-photo-3483800.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bot Feliz', imagen: 'https://images.pexels.com/photos/4587663/pexels-photo-4587663.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bot Contento', imagen: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bot Radiante', imagen: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bot Alegre', imagen: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bot Jubiloso', imagen: 'https://images.pexels.com/photos/1820961/pexels-photo-1820961.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bot Encantado', imagen: 'https://images.pexels.com/photos/1052548/pexels-photo-1052548.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bot Satisfecho', imagen: 'https://images.pexels.com/photos/837140/pexels-photo-837140.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bot Eufórico', imagen: 'https://images.pexels.com/photos/508192/pexels-photo-508192.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bot Animado', imagen: 'https://images.pexels.com/photos/720598/pexels-photo-720598.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+        { nombre: 'Bot Entusiasta', imagen: 'https://images.pexels.com/photos/939842/pexels-photo-939842.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', puntuacion: 0 },
+    ];
 }
 
+function actualizarPuntajeBot(nombreBot, resultado) {
+    let puntajeBot = parseInt(localStorage.getItem(`${nombreBot}_puntaje`), 10) || 0;
+    if (resultado === 'ganada') {
+        puntajeBot += puntosPartida;
+    } else if (resultado === 'perdida') {
+        puntajeBot = Math.max(0, puntajeBot - puntosPartida);
+    }
+    localStorage.setItem(`${nombreBot}_puntaje`, puntajeBot.toString());
+}
+
+// Por ejemplo, cuando 'Byte Bromista' gana:
+actualizarPuntajeBot('Byte Bromista', 10);
+
+// O cuando 'Chispa Cibernética' gana:
+actualizarPuntajeBot('Chispa Cibernética', 10);
+
+actualizarPuntajeBot('Risueño Robot', 10);
+
+actualizarPuntajeBot('Risueño Robot', 10);
+actualizarPuntajeBot('Bit Alegre', 10);
+actualizarPuntajeBot('Código Chispeante', 10);
+actualizarPuntajeBot('Tecno Travesura', 10);
+actualizarPuntajeBot('Ráfaga Risueña', 10);
+actualizarPuntajeBot('Circuit Sonrisa', 10);
+actualizarPuntajeBot('Circuit Sonrisa', 10);
+actualizarPuntajeBot('Bot Feliz', 10);
+actualizarPuntajeBot('Bot Contento', 10);
+actualizarPuntajeBot('Bot Radiante', 10);
+actualizarPuntajeBot('Bot Alegre', 10);
+actualizarPuntajeBot('Bot Jubiloso', 10);
+actualizarPuntajeBot('Bot Encantado', 10);
+actualizarPuntajeBot('Bot Satisfecho', 10);
+actualizarPuntajeBot('Bot Eufórico', 10);
+actualizarPuntajeBot('Bot Animado', 10);
+actualizarPuntajeBot('Bot Entusiasta', 10);
+actualizarPuntajeBot('Bytes Divertidos', 10);
+
+
+function actualizarClasificaciones() {
+    const clasificaciones = [
+        { nombre: obtenerNombreUsuario(), imagen: localStorage.getItem('fotoPerfil') || 'ruta/de/imagen/vacia.jpg', puntuacion: puntaje }
+    ].concat(obtenerBots().map(bot => ({
+        ...bot,
+        puntuacion: parseInt(localStorage.getItem(`${bot.nombre}_puntaje`), 10) || 0
+    })));
+
+    clasificaciones.sort((a, b) => b.puntuacion - a.puntuacion);
+
+    // Actualizar la tabla de clasificaciones en el DOM
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabla = document.getElementById('tablaClasificaciones');
+        if (tabla) {
+            const cuerpoTabla = tabla.querySelector('tbody');
+            if (cuerpoTabla) {
+                cuerpoTabla.innerHTML = '';
+                clasificaciones.forEach((clasificacion, index) => {
+                    const fila = document.createElement('tr');
+                    fila.dataset.nombre = clasificacion.nombre;
+                    fila.innerHTML = `<td>${index + 1}</td><td><img src="${clasificacion.imagen}" width="40" height="40"></td><td>${clasificacion.nombre}</td><td>${clasificacion.puntuacion}</td>`;
+                    cuerpoTabla.appendChild(fila);
+                });
+            }
+        }
+    });
+}
+
+
+// Función para generar un nombre aleatorio de bot
+function generarNombreAleatorio() {
+    const bots = obtenerBots();
+    const indiceAleatorio = Math.floor(Math.random() * bots.length);
+    return bots[indiceAleatorio].nombre;
+}
+
+// Función para generar una elección aleatoria de piedra, papel o tijeras
+function generarEleccionAleatoria() {
+    const opciones = ['piedra', 'papel', 'tijeras'];
+    const indiceAleatorio = Math.floor(Math.random() * opciones.length);
+    return opciones[indiceAleatorio];
+}
+
+// Integrar la actualización del puntaje del bot en la función elegir
 function elegir(eleccionJugador) {
     if (puntaje < puntosPartida) {
         alert("No tienes suficientes puntos para jugar por esta cantidad.");
@@ -53,6 +157,9 @@ function elegir(eleccionJugador) {
     document.getElementById('resultado').innerText = `${nombreJugador} escogió ${eleccionJugador}. ${nombreMaquina} escogió ${eleccionMaquina}. ${resultado}`;
 
     actualizarPuntaje(resultado);
+    actualizarExperiencia(resultado);
+    actualizarPuntajeBot(nombreMaquina, resultado.includes('Ganaste') ? 'perdida' : resultado.includes('Perdiste') ? 'ganada' : 'empatada');
+    actualizarClasificaciones();
 }
 
 function generarEleccionAleatoria() {
@@ -95,6 +202,70 @@ function actualizarPuntaje(resultado) {
     if (puntaje > maxPuntaje) {
       localStorage.setItem('maxPuntaje', puntaje);
     }
+}
+
+function actualizarExperiencia(resultado) {
+    let puntosExperiencia = 0;
+    switch (puntosPartida) {
+        case 10:
+            puntosExperiencia = resultado === 'ganada' ? 10 : resultado === 'empatada' ? 5 : 3;
+            break;
+        case 20:
+            puntosExperiencia = resultado === 'ganada' ? 20 : resultado === 'empatada' ? 10 : 5;
+            break;
+        case 50:
+            puntosExperiencia = resultado === 'ganada' ? 50 : resultado === 'empatada' ? 20 : 10;
+            break;
+        case 100:
+            puntosExperiencia = resultado === 'ganada' ? 100 : resultado === 'empatada' ? 50 : 25;
+            break;
+        case 200:
+            puntosExperiencia = resultado === 'ganada' ? 200 : resultado === 'empatada' ? 100 : 50;
+            break;
+    }
+
+    experiencia += puntosExperiencia;
+    while (experiencia >= experienciaPorNivel) {
+        experiencia -= experienciaPorNivel;
+        nivel++;
+    }
+
+    localStorage.setItem('experiencia', experiencia);
+    localStorage.setItem('nivel', nivel);
+
+    actualizarBarraExperiencia();
+}
+
+function actualizarBarraExperiencia() {
+    const barraExperiencia = document.getElementById('barraExperiencia');
+    const experienciaActual = document.getElementById('experienciaActual');
+    const experienciaMaxima = document.getElementById('experienciaMaxima');
+    const nivelSpan = document.getElementById('nivel');
+
+    experienciaActual.innerText = experiencia;
+    experienciaMaxima.innerText = experienciaPorNivel;
+    nivelSpan.innerText = nivel;
+    barraExperiencia.style.width = (experiencia / experienciaPorNivel) * 100 + '%';
+}
+
+function guardarLogros() {
+    let logros = JSON.parse(localStorage.getItem('logros')) || {};
+
+    const logrosDefinidos = [
+        { nombre: 'Primera Victoria', descripcion: 'Gana tu primera partida.', objetivo: 1, tipo: 'victorias' },
+        { nombre: 'Diez Victorias', descripcion: 'Gana diez partidas.', objetivo: 10, tipo: 'victorias' },
+        { nombre: 'Invicto', descripcion: 'Gana cinco partidas consecutivas.', objetivo: 5, tipo: 'victoriasConsecutivas' },
+    ];
+
+    logrosDefinidos.forEach(logro => {
+        if (progresoLogros[logro.tipo] >= logro.objetivo && !logros[logro.nombre]) {
+            logros[logro.nombre] = true;
+            alert(`¡Logro obtenido: ${logro.nombre}! ${logro.descripcion}`);
+        }
+    });
+
+    localStorage.setItem('logros', JSON.stringify(logros));
+    localStorage.setItem('progresoLogros', JSON.stringify(progresoLogros)); // Asegúrate de guardar el progreso también
 }
 
 function establecerPuntos(puntos) {
@@ -145,19 +316,12 @@ if (nombreUsuario) {
     document.getElementById('mensajeBienvenida').appendChild(h2Element);
 }
 
-if (imagenUsuario) {
-    const imgElement = document.createElement('img');
-    imgElement.src = imagenUsuario;
-    imgElement.style.width = '100px';
-    imgElement.style.height = '100px';
-    imgElement.style.borderRadius = '50%';
-    document.getElementById('imagenBienvenida').appendChild(imgElement);
-}
 
 document.addEventListener('DOMContentLoaded', function() {
     puntaje = parseInt(localStorage.getItem('puntaje')) || 0;
     document.getElementById('puntos').innerText = puntaje;
     cargarArtefactoEquipado();
+    actualizarBarraExperiencia();
 });
 
 function obtenerArtefactoEquipado() {
@@ -180,9 +344,30 @@ function cargarArtefactoEquipado() {
     }
 }
 
+function cargarImagenPerfil() {
+    const imagenPerfil = document.getElementById('imagenPerfil');
+    const nombreJugador = document.getElementById('nombreJugador');
+    
+    if (imagenPerfil && nombreJugador) {
+        const urlImagenPerfil = localStorage.getItem('fotoPerfil');
+        const nombre = localStorage.getItem('nombreUsuario') || 'Jugador';
+        
+        if (urlImagenPerfil) {
+            imagenPerfil.src = urlImagenPerfil;
+        } else {
+            imagenPerfil.src = 'ruta/de/imagen/predeterminada.jpg'; // Asegúrate de tener una imagen predeterminada
+        }
+        
+        nombreJugador.textContent = nombre;
+    }
+}
+
 // Llama a la función para cargar el artefacto equipado al cargar la página
-document.addEventListener('DOMContentLoaded', cargarArtefactoEquipado);
-
-
-
-
+document.addEventListener('DOMContentLoaded', function() {
+    puntaje = parseInt(localStorage.getItem('puntaje')) || 0;
+    document.getElementById('puntos').innerText = puntaje;
+    cargarArtefactoEquipado();
+    actualizarBarraExperiencia();
+    actualizarClasificaciones();
+    cargarImagenPerfil(); // Agregamos esta línea
+});

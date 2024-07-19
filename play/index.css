@@ -1,4 +1,151 @@
-body{
-    background-color: rgb(5, 5, 53);
-    color: #fff;
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    flex-direction: column;
+    position: relative; /* Añade esta línea */
+    min-height: 100vh; /* Añade esta línea */
+  }
+
+  .contenedor {
+    margin-bottom: 60px; /* Añade esta línea */
+    text-align: center;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    position: relative;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  button {
+    padding: 15px 25px;
+    font-size: 16px;
+    margin: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+  }
+
+  button:disabled {
+    background-color: #ccc;
+  }
+
+  #nombreArtefactoEquipado {
+    margin-bottom: 20px;
+  }
+
+  #imagenArtefacto {
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  #resultado, #contador {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+
+  a {
+    display: block;
+    margin-top: 30px;
+    text-decoration: none;
+    color: white;
+    background-color: #b00000;
+    padding: 10px 15px;
+    font-size: 18px;
+    border-radius: 10px;
+  }
+
+  .superior-izquierda, .superior-derecha, .inferior-izquierda {
+    position: absolute;
+    padding: 10px;
+  }
+
+  .superior-izquierda {
+    top: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .superior-izquierda img {
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .superior-derecha {
+    top: 10px;
+    right: 10px;
+  }
+
+  .inferior-izquierda {
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .inferior-derecha {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+  }
+
+  .puntaje {
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .puntaje span {
+    display: block;
+    font-size: 36px;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+
+  .experiencia {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .barra-experiencia {
+    width: 80%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px auto;
+  }
+
+  .barra-experiencia-inner {
+    height: 100%;
+    background-color: #76c7c0;
+    width: 0;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .boton-ganar-puntos {
+    background-color: #28a745; /* Un color diferente para distinguirlo */
+    padding: 10px 15px; /* Ajusta el tamaño según necesites */
+    font-size: 14px; /* Ajusta el tamaño de la fuente */
 }
+
+  @media (max-width: 600px) {
+    button {
+      width: 100%;
+      margin: 5px 0;
+    }
+
+    .superior-izquierda, .superior-derecha, .inferior-izquierda, .inferior-derecha {
+      padding: 5px;
+    }
+  }
