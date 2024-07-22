@@ -50,85 +50,86 @@ document.addEventListener('DOMContentLoaded', function() {
   cargarImagenPerfil();
 });
 
-let elementoArrastrado = null;
-let offsetX, offsetY;
-let posicionInicialX, posicionInicialY;
 
-function iniciarArrastre(e) {
-  elementoArrastrado = this;
-  const rect = elementoArrastrado.getBoundingClientRect();
-  
-  if (e.type === 'mousedown') {
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
-  } else if (e.type === 'touchstart') {
-    offsetX = e.touches[0].clientX - rect.left;
-    offsetY = e.touches[0].clientY - rect.top;
-  }
+let activeElement = null;
+let startY = 0;
 
-  posicionInicialX = rect.left;
-  posicionInicialY = rect.top;
+document.addEventListener('DOMContentLoaded', function() {
+  const botones = document.querySelectorAll('.btn-opcion');
+  botones.forEach(boton => {
+    boton.addEventListener('mousedown', iniciarMovimiento);
+    boton.addEventListener('touchstart', iniciarMovimiento, { passive: false });
+  });
 
-  elementoArrastrado.style.position = 'fixed';
-  elementoArrastrado.style.left = `${posicionInicialX}px`;
-  elementoArrastrado.style.top = `${posicionInicialY}px`;
-  elementoArrastrado.classList.add('dragging');
-  
+  document.addEventListener('mousemove', moverElemento);
+  document.addEventListener('touchmove', moverElemento, { passive: false });
+  document.addEventListener('mouseup', soltarElemento);
+  document.addEventListener('touchend', soltarElemento);
+});
+
+function iniciarMovimiento(e) {
   e.preventDefault();
+  activeElement = this.cloneNode(true);
+  activeElement.classList.add('moving');
+  document.body.appendChild(activeElement);
+
+  const touch = e.type === 'touchstart' ? e.touches[0] : e;
+  startY = touch.clientY;
+
+  posicionarElemento(touch.clientX, touch.clientY);
 }
 
 function moverElemento(e) {
-  if (!elementoArrastrado) return;
-
-  let clientX, clientY;
-  if (e.type === 'mousemove') {
-    clientX = e.clientX;
-    clientY = e.clientY;
-  } else if (e.type === 'touchmove') {
-    clientX = e.touches[0].clientX;
-    clientY = e.touches[0].clientY;
-  }
-
-  const newX = clientX - offsetX;
-  const newY = clientY - offsetY;
-
-  elementoArrastrado.style.left = `${newX}px`;
-  elementoArrastrado.style.top = `${newY}px`;
-
-  // Verificar si el elemento ha sido arrastrado lo suficiente verticalmente
-  const windowHeight = window.innerHeight;
-  const dragThreshold = windowHeight * 0.85; // 3/4 de la altura de la pantalla desde abajo
-
-  if (newY < dragThreshold) {
-    elementoArrastrado.classList.add('ready-to-release');
-  } else {
-    elementoArrastrado.classList.remove('ready-to-release');
-  }
-
+  if (!activeElement) return;
   e.preventDefault();
+
+  const touch = e.type === 'touchmove' ? e.touches[0] : e;
+  posicionarElemento(touch.clientX, touch.clientY);
+}
+
+function posicionarElemento(x, y) {
+  activeElement.style.position = 'fixed';
+  activeElement.style.left = `${x}px`;
+  activeElement.style.top = `${y}px`;
+  activeElement.style.transform = 'translate(-50%, -50%)';
+
+  const windowHeight = window.innerHeight;
+  const releaseThreshold = windowHeight * 0.85; // 15% desde arriba
+
+  if (y < releaseThreshold) {
+    activeElement.classList.add('ready-to-release');
+  } else {
+    activeElement.classList.remove('ready-to-release');
+  }
 }
 
 function soltarElemento(e) {
-  if (!elementoArrastrado) return;
+  if (!activeElement) return;
 
-  const rect = elementoArrastrado.getBoundingClientRect();
-  const centerY = rect.top + rect.height / 2;
+  const touch = e.type === 'touchend' ? e.changedTouches[0] : e;
+  const finalY = touch.clientY;
+
   const windowHeight = window.innerHeight;
-  const releaseThreshold = windowHeight * 0.85; // 3/4 de la altura de la pantalla desde abajo
+  const releaseThreshold = windowHeight * 0.75; // 15% desde arriba
 
-  if (centerY < releaseThreshold) {
-    const opcion = elementoArrastrado.getAttribute('data-opcion');
+  if (finalY < releaseThreshold) {
+    const opcion = activeElement.getAttribute('data-opcion');
     elegir(opcion);
   }
 
-  // Restaurar la posición original
-  elementoArrastrado.style.position = '';
-  elementoArrastrado.style.left = '';
-  elementoArrastrado.style.top = '';
-  elementoArrastrado.classList.remove('dragging');
-  elementoArrastrado.classList.remove('ready-to-release');
-  elementoArrastrado = null;
+  document.body.removeChild(activeElement);
+  activeElement = null;
 }
+
+function elegir(eleccionJugador) {
+  // Tu lógica existente para procesar la elección del jugador
+  console.log(`Jugador eligió: ${eleccionJugador}`);
+  // Aquí deberías llamar a tu función existente que maneja la lógica del juego
+}
+
+
+
+
 
 function elegir(eleccionJugador) {
   if (puntaje < puntosPartida) {

@@ -1,3 +1,5 @@
+
+
 body {
     /* ... (mantener los estilos existentes) ... */
     padding-bottom: 100px; /* Añadir espacio para los botones inferiores */
@@ -7,24 +9,9 @@ body {
     /* ... (mantener los estilos existentes) ... */
     margin-bottom: 120px; /* Aumentar el margen inferior */
 }
-
-/* Nuevo estilo para los botones de Piedra, Papel, Tijera */
-.inferior {
-    position: fixed;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    padding: 0 10px;
-  }
-  
-  .btn-opcion {
+.btn-opcion {
     width: 80px;
     height: 80px;
-    cursor: grab;
-    transition: transform 0.3s ease;
     position: relative;
     touch-action: none;
   }
@@ -36,24 +23,44 @@ body {
     pointer-events: none;
   }
   
-  .btn-opcion.dragging {
-    cursor: grabbing;
+  .moving {
+    position: fixed;
     z-index: 1000;
+    width: 80px;
+    height: 80px;
+    pointer-events: none;
+    transition: transform 0.1s ease;
   }
   
-  .release-indicator {
-  display: none;
-  position: absolute;
-  bottom: 100%; /* Cambiado de top a bottom */
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 24px;
-  color: #ff0000;
-  margin-bottom: 5px; /* Añadido para separar un poco del botón */
-}
+  .moving.ready-to-release {
+    transform: scale(1.1) translate(-50%, -50%) !important;
+  }
   
-  .btn-opcion.ready-to-release .release-indicator {
-    display: block;
+  .moving::after {
+    content: '↑';
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    color: #ff0000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .moving.ready-to-release::after {
+    opacity: 1;
+  }
+  
+  .inferior {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 10px;
   }
 
 /*POP UP*/
@@ -89,8 +96,8 @@ body {
     border: none;
     cursor: pointer;
     padding: 0;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
 }
 
 .btn-opcion img {
@@ -290,12 +297,12 @@ a {
     }
     
     #opcionesJuego {
-        bottom: 10px;
+        bottom: 25px;
     }
 
     #opcionesJuego img {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
     }
 
     #opcionesPuntos {
