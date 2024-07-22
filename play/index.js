@@ -1,3 +1,18 @@
+
+document.addEventListener('DOMContentLoaded', function() {
+    let puntaje = parseInt(localStorage.getItem('puntaje')) || 0;
+    let puntosSpan = document.getElementById('puntos');
+    if (puntosSpan) {
+        puntosSpan.textContent = puntaje;
+    }
+    cargarArtefactoEquipado();
+    actualizarBarraExperiencia();
+    actualizarClasificaciones();
+    cargarImagenPerfil();
+});
+
+
+
 function abrirPopupPuntos() {
   document.getElementById("popupPuntos").style.display = "block";
 }
@@ -104,23 +119,30 @@ function posicionarElemento(x, y) {
 }
 
 function soltarElemento(e) {
-  if (!activeElement) return;
-
-  const touch = e.type === 'touchend' ? e.changedTouches[0] : e;
-  const finalY = touch.clientY;
-
-  const windowHeight = window.innerHeight;
-  const releaseThreshold = windowHeight * 0.75; // 15% desde arriba
-
-  if (finalY < releaseThreshold) {
-    const opcion = activeElement.getAttribute('data-opcion');
-    elegir(opcion);
+    if (!activeElement) return;
+  
+    const touch = e.type === 'touchend' ? e.changedTouches[0] : e;
+    const finalY = touch.clientY;
+  
+    const windowHeight = window.innerHeight;
+    const releaseThreshold = windowHeight * 0.75; // 25% desde arriba
+  
+    if (finalY < releaseThreshold) {
+      const opcion = activeElement.getAttribute('data-opcion');
+      activeElement.classList.add('released');
+      setTimeout(() => {
+        document.body.removeChild(activeElement);
+        activeElement = null;
+        elegir(opcion);
+      }, 300); // Espera 300ms para la animación antes de eliminar el elemento
+    } else {
+      document.body.removeChild(activeElement);
+      activeElement = null;
+    }
   }
 
-  document.body.removeChild(activeElement);
-  activeElement = null;
-}
 
+  
 function elegir(eleccionJugador) {
   // Tu lógica existente para procesar la elección del jugador
   console.log(`Jugador eligió: ${eleccionJugador}`);
@@ -286,6 +308,7 @@ function generarEleccionAleatoria() {
 
 // Integrar la actualización del puntaje del bot en la función elegir
 function elegir(eleccionJugador) {
+    let puntaje = parseInt(localStorage.getItem('puntaje')) || 0;
     if (puntaje < puntosPartida) {
         alert("No tienes suficientes puntos para jugar por esta cantidad.");
         return;
@@ -302,6 +325,7 @@ function elegir(eleccionJugador) {
     actualizarExperiencia(resultado);
     actualizarPuntajeBot(nombreMaquina, resultado.includes('Ganaste') ? 'perdida' : resultado.includes('Perdiste') ? 'ganada' : 'empatada');
     actualizarClasificaciones();
+    actualizarInterfazLogros();
 }
 
 function generarEleccionAleatoria() {
@@ -333,16 +357,25 @@ function determinarGanador(eleccionJugador, eleccionMaquina) {
 }
 
 function actualizarPuntaje(resultado) {
+    let puntosTotal = parseInt(localStorage.getItem('puntaje')) || 0;
+    
+    if (resultado.includes('Ganaste')) {
+        puntosTotal += puntosPartida;
+    } else if (resultado.includes('Perdiste')) {
+        puntosTotal = Math.max(0, puntosTotal - puntosPartida);
+    }
+    
+    localStorage.setItem('puntaje', puntosTotal);
+    
     let puntosSpan = document.getElementById('puntos');
-    puntosSpan.innerText = puntaje;
-  
-    // Guardar el puntaje actual
-    localStorage.setItem('puntaje', puntaje);
-  
-    // Obtener y actualizar el máximo puntaje
+    if (puntosSpan) {
+        puntosSpan.textContent = puntosTotal;
+    }
+    
+    // Actualizar máximo puntaje
     let maxPuntaje = parseInt(localStorage.getItem('maxPuntaje')) || 0;
-    if (puntaje > maxPuntaje) {
-      localStorage.setItem('maxPuntaje', puntaje);
+    if (puntosTotal > maxPuntaje) {
+        localStorage.setItem('maxPuntaje', puntosTotal);
     }
 }
 

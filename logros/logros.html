@@ -3,17 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logros</title>
+  <title>Logros - Piedra, Papel, Tijeras</title>
   <link rel="stylesheet" href="logros.css">
 </head>
 <body>
   <div class="contenedor">
-    <h1>Logros</h1>
-    <div id="contenedorLogros"></div>
+    <header>
+      <h1>Logros <span id="iconoLogros" class="icono-logros">🏆</span></h1>
+      <div id="puntosTotales">Puntos totales: <span id="puntos">0</span></div>
+    </header>
+    
+    <main>
+      <div id="contenedorLogros">
+        <!-- Los logros se generarán dinámicamente aquí -->
+      </div>
+    </main>
+    
+    <footer>
+      <div id="newAchievementIndicator" style="display: none;">¡Nuevo logro disponible!</div>
+    </footer>
   </div>
-  <div class="inferior-izquierda">
-    <a href="../index.html">Atrás</a>
-  </div>
+  
+  <nav class="inferior-izquierda">
+    <a href="../index.html" class="boton-atras">Atrás</a>
+  </nav>
 
   <script src="logros.js"></script>
 </body>

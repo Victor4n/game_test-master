@@ -9,7 +9,7 @@ body {
     height: 100vh;
 }
 
-.container {
+.contenedor {
     width: 90%;
     max-width: 600px;
     margin: auto;
@@ -56,11 +56,38 @@ h1 {
     left: 10px;
     position: absolute;
     padding: 10px;
-  }
+}
 
-  a {
+a {
     display: block;
     margin-top: 30px;
     text-decoration: none;
     color: #007bff;
-  }
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+}
+
+.achievements {
+    position: relative;
+    display: inline-block;
+}
+
+.new-achievement-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+}
