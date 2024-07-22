@@ -23,7 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('overlay').style.display = 'none';
   });
 
-  document.addEventListener('DOMContentLoaded', function() {
+// ... (código existente para la barra de carga)
+
+document.addEventListener('DOMContentLoaded', function() {
     let playerProfile = document.getElementById('playerProfile');
     let playerName = document.getElementById('playerName');
     let imagenPrevia = document.getElementById('imagenPrevia');
@@ -45,14 +47,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Añadir eventos de clic
     playerProfile.addEventListener('click', function() {
-        // Redirigir a la página de perfil
         window.location.href = '../perfil del jugador/perfilEdicion.html';
     });
 
     achievements.addEventListener('click', function() {
-        // Redirigir a la página de logros
         window.location.href = '../logros/logros.html';
     });
 
-    // ... (resto de tu código JavaScript)
+    // Nuevo código para el indicador de logros
+    crearIndicadorLogro();
+    actualizarIconoLogros();
 });
+
+function crearIndicadorLogro() {
+    const indicador = document.createElement('div');
+    indicador.id = 'newAchievementIndicator';
+    indicador.style.position = 'absolute';
+    indicador.style.width = '15px';
+    indicador.style.height = '15px';
+    indicador.style.top = '0';
+    indicador.style.right = '0';
+    indicador.style.backgroundColor = 'red';
+    indicador.style.borderRadius = '50%';
+    indicador.style.display = 'none';
+    const achievements = document.getElementById('achievements');
+    achievements.appendChild(indicador);
+    animarIndicadorLogro();
+}
+
+function animarIndicadorLogro() {
+    const indicador = document.getElementById('newAchievementIndicator');
+    if (indicador) {
+        let scale = 1;
+        let growing = true;
+        
+        setInterval(() => {
+            if (growing) {
+                scale += 0.05;
+                if (scale >= 1.2) growing = false;
+            } else {
+                scale -= 0.05;
+                if (scale <= 1) growing = true;
+            }
+            indicador.style.transform = `scale(${scale})`;
+        }, 50);
+    }
+}
+
+function actualizarIconoLogros() {
+    const progresoLogros = JSON.parse(localStorage.getItem('progresoLogros')) || {};
+    const logrosReclamados = JSON.parse(localStorage.getItem('logrosReclamados')) || {};
+    const logrosDefinidos = JSON.parse(localStorage.getItem('logrosDefinidos')) || [];
+    
+    // ... (logs de depuración existentes) ...
+
+    const hayLogrosSinReclamar = logrosDefinidos.some(logro => {
+        const progreso = progresoLogros[logro.tipo] || 0;
+        const reclamado = logrosReclamados[logro.nombre];
+        return progreso >= logro.objetivo && !reclamado;
+    });
+
+
+    const indicador = document.getElementById('newAchievementIndicator');
+    if (indicador) {
+        indicador.style.visibility = hayLogrosSinReclamar ? 'visible' : 'hidden';
+    } else {
+        console.log("El elemento indicador no se encontró en el DOM"); // Debugging
+    }
+}

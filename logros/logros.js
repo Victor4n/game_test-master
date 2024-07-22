@@ -5,9 +5,13 @@ const logrosDefinidos = [
     { nombre: 'Cinco Victorias Consecutivas', descripcion: 'Gana cinco partidas consecutivas.', objetivo: 5, tipo: 'victoriasConsecutivas', recompensa: 1000 }
 ];
 
+// Guardar logros definidos en localStorage
+localStorage.setItem('logrosDefinidos', JSON.stringify(logrosDefinidos));
+
 document.addEventListener('DOMContentLoaded', function() {
     actualizarInterfazLogros();
 });
+
 
 function actualizarProgresoLogros(tipo, incremento) {
     let progresoLogros = JSON.parse(localStorage.getItem('progresoLogros')) || { victorias: 0, victoriasConsecutivas: 0, puntosTotal: 0 };
@@ -19,6 +23,7 @@ function actualizarProgresoLogros(tipo, incremento) {
 }
 
 function actualizarInterfazLogros() {
+    const logrosDefinidos = JSON.parse(localStorage.getItem('logrosDefinidos')) || [];
     const progresoLogros = JSON.parse(localStorage.getItem('progresoLogros')) || { victorias: 0, victoriasConsecutivas: 0, puntosTotal: 0 };
     const logrosReclamados = JSON.parse(localStorage.getItem('logrosReclamados')) || {};
     
@@ -54,7 +59,23 @@ function actualizarInterfazLogros() {
     actualizarIconoLogros();
 }
 
+function actualizarIconoLogros() {
+    const logrosDefinidos = JSON.parse(localStorage.getItem('logrosDefinidos')) || [];
+    const progresoLogros = JSON.parse(localStorage.getItem('progresoLogros')) || {};
+    const logrosReclamados = JSON.parse(localStorage.getItem('logrosReclamados')) || {};
+    
+    const hayLogrosSinReclamar = logrosDefinidos.some(logro => 
+        progresoLogros[logro.tipo] >= logro.objetivo && !logrosReclamados[logro.nombre]
+    );
+    
+    const newAchievementIndicator = document.getElementById('newAchievementIndicator');
+    if (newAchievementIndicator) {
+        newAchievementIndicator.style.display = hayLogrosSinReclamar ? 'block' : 'none';
+    }
+}
+
 function reclamarLogro(nombreLogro) {
+    const logrosDefinidos = JSON.parse(localStorage.getItem('logrosDefinidos')) || [];
     let progresoLogros = JSON.parse(localStorage.getItem('progresoLogros')) || { victorias: 0, victoriasConsecutivas: 0, puntosTotal: 0 };
     let logrosReclamados = JSON.parse(localStorage.getItem('logrosReclamados')) || {};
     let puntosTotal = parseInt(localStorage.getItem('puntaje')) || 0;
@@ -73,37 +94,8 @@ function reclamarLogro(nombreLogro) {
     }
 }
 
-// Función auxiliar para actualizar el puntaje en el DOM
-function actualizarPuntajeEnDOM(puntaje) {
-    const puntosElement = document.getElementById('puntos');
-    if (puntosElement) {
-        puntosElement.textContent = puntaje;
-    }
-}
-
-function actualizarIconoLogros() {
-    const progresoLogros = JSON.parse(localStorage.getItem('progresoLogros')) || { victorias: 0, victoriasConsecutivas: 0, puntosTotal: 0 };
-    const logrosReclamados = JSON.parse(localStorage.getItem('logrosReclamados')) || {};
-    
-    const hayLogrosSinReclamar = logrosDefinidos.some(logro => 
-        progresoLogros[logro.tipo] >= logro.objetivo && !logrosReclamados[logro.nombre]
-    );
-    
-    const newAchievementIndicator = document.getElementById('newAchievementIndicator');
-    if (newAchievementIndicator) {
-        newAchievementIndicator.style.display = hayLogrosSinReclamar ? 'block' : 'none';
-    }
-}
-
-function inicializarPuntos() {
-    const puntosTotal = parseInt(localStorage.getItem('puntaje')) || 0;
-    const puntosElement = document.getElementById('puntos');
-    if (puntosElement) {
-        puntosElement.textContent = puntosTotal;
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     inicializarPuntos();
     actualizarInterfazLogros();
 });
+

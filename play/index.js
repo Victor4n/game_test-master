@@ -134,7 +134,7 @@ function soltarElemento(e) {
         document.body.removeChild(activeElement);
         activeElement = null;
         elegir(opcion);
-      }, 300); // Espera 300ms para la animación antes de eliminar el elemento
+      }); // Espera 300ms para la animación antes de eliminar el elemento
     } else {
       document.body.removeChild(activeElement);
       activeElement = null;

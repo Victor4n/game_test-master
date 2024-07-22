@@ -73,6 +73,32 @@ body {
     object-fit: contain;
 }
 
+.achievement-indicator {
+    position: absolute;
+    top: -5px;  /* Ajustado para que sea más visible */
+    right: -5px;  /* Ajustado para que sea más visible */
+    width: 15px;
+    height: 15px;
+    background-color: red;
+    border-radius: 50%;
+    /* Remover display: none; para que pueda ser controlado por JavaScript */
+    animation: pulse 1s infinite;
+    /* Asegurar que esté por encima de otros elementos */
+    z-index: 10;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 h1 {
     text-align: center;
     margin-top: 60px;

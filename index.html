@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú del Juego</title>
+    <title>MadManos</title>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
     <div class="container">
-        <div class="player-profile" id="playerProfile">
+        <div id="playerProfile" class="player-profile">
             <div class="player-avatar">
-                <img id="imagenPrevia" src="ruta/de/imagen/vacia.jpg" alt="Avatar del jugador">
+                <img src="ruta/de/imagen/vacia.jpg" alt="Avatar del jugador" id="imagenPrevia">
             </div>
             <p class="player-name" id="playerName">Jugador</p>
         </div>
-        <div class="achievements" id="achievements">
+
+        <div id="achievements" class="achievements">
             <img src="https://www.pngplay.com/wp-content/uploads/12/Award-Cup-PNG-Photos.png" alt="Logros">
+            <div id="newAchievementIndicator" class="achievement-indicator"></div>
         </div>
-        <div class="container">
-            <h1 class="title">MadManos</h1>
+
+        <h1 id="madmanos" class="title">MadManos</h1>
+
         <div class="menu-grid">
-            
             <a href="play/index.html" class="menu-item jugar">Jugar</a>
             <a href="personalizar mano/personalizacion.html" class="menu-item inventario">Inventario</a>
             <a href="tienda/compras.html" class="menu-item tienda">Tienda</a>
