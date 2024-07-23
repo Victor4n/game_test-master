@@ -22,6 +22,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.casilla').forEach(casilla => {
         casilla.addEventListener('click', seleccionarCasilla);
     });
+
+    // Verificar si hay un código de partida en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const codigoEnURL = urlParams.get('codigo');
+    if (codigoEnURL) {
+        document.getElementById('codigoUnirse').value = codigoEnURL;
+        unirsePartida();
+    }
 });
 
 function crearPartida() {
@@ -37,31 +45,50 @@ function crearPartida() {
     }
     codigoPartida = Math.random().toString(36).substr(2, 6).toUpperCase();
     modoJuego = 'creador';
-    localStorage.setItem('partidaGrandesApuestas', JSON.stringify({
+    
+    // Crear URL con el código de partida
+    const nuevaURL = `${window.location.origin}${window.location.pathname}?codigo=${codigoPartida}`;
+    
+    // Mostrar el código y la URL para compartir
+    alert(`Tu código de partida es: ${codigoPartida}\nComparte esta URL con tu oponente: ${nuevaURL}`);
+    
+    const partidaInfo = {
         codigo: codigoPartida,
         monto: monto,
         jugadores: [nickname, ''],
         jugadorActual: 1
-    }));
+    };
+    localStorage.setItem('partidaGrandesApuestas', JSON.stringify(partidaInfo));
     mostrarSalaEspera();
 }
 
 function unirsePartida() {
     const codigo = document.getElementById('codigoUnirse').value.toUpperCase();
     const nickname = document.getElementById('nickname').value;
+    if (!nickname) {
+        alert('Por favor, ingresa un nickname');
+        return;
+    }
+    
+    // Verificar si existe una partida con ese código
     const partidaGuardada = JSON.parse(localStorage.getItem('partidaGrandesApuestas'));
     if (partidaGuardada && partidaGuardada.codigo === codigo) {
-        if (!nickname) {
-            alert('Por favor, ingresa un nickname');
-            return;
-        }
         codigoPartida = codigo;
         modoJuego = 'invitado';
         partidaGuardada.jugadores[1] = nickname;
         localStorage.setItem('partidaGrandesApuestas', JSON.stringify(partidaGuardada));
         mostrarSalaEspera();
     } else {
-        alert('Código de partida inválido');
+        // Si no existe localmente, crear una nueva partida como invitado
+        const nuevaPartida = {
+            codigo: codigo,
+            monto: 0, // El monto se actualizará cuando el creador inicie la partida
+            jugadores: ['', nickname],
+            jugadorActual: 1
+        };
+        localStorage.setItem('partidaGrandesApuestas', JSON.stringify(nuevaPartida));
+        modoJuego = 'invitado';
+        mostrarSalaEspera();
     }
 }
 
@@ -74,10 +101,11 @@ function mostrarSalaEspera() {
 function actualizarSalaEspera() {
     const partidaGuardada = JSON.parse(localStorage.getItem('partidaGrandesApuestas'));
     document.getElementById('codigoPartida').textContent = `Código de partida: ${partidaGuardada.codigo}`;
-    document.getElementById('jugador1').textContent = `Jugador 1: ${partidaGuardada.jugadores[0]} ${jugadoresListos[0] ? '(Listo)' : ''}`;
+    document.getElementById('jugador1').textContent = `Jugador 1: ${partidaGuardada.jugadores[0] || 'Esperando...'} ${jugadoresListos[0] ? '(Listo)' : ''}`;
     document.getElementById('jugador2').textContent = `Jugador 2: ${partidaGuardada.jugadores[1] || 'Esperando...'} ${jugadoresListos[1] ? '(Listo)' : ''}`;
 }
 
+// ... (el resto del código permanece igual)
 function jugadorListo() {
     const jugadorIndex = modoJuego === 'creador' ? 0 : 1;
     jugadoresListos[jugadorIndex] = true;
