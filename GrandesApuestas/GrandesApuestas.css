@@ -1,0 +1,59 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+#inicio, #juego {
+    text-align: center;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+input, button {
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+#tablero {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.casillas {
+    display: flex;
+}
+
+.casilla {
+    width: 100px;
+    height: 150px;
+    border: 2px solid #000;
+    margin: 0 10px;
+    background-image: url('carta-reverso.jpg');
+    background-size: cover;
+}
+
+.ppt {
+    width: 80px;
+    height: 80px;
+    margin: 10px;
+    cursor: move;
+}
+
+#temporizador {
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+#mensaje {
+    margin-top: 20px;
+    font-weight: bold;
+}

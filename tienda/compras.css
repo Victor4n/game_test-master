@@ -1,19 +1,97 @@
-body{
+body {
     background-color: rgb(5, 5, 53);
     color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.contenedor {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+}
+
+#puntosCompra {
+    text-align: center;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.grid-tienda {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    justify-content: center;
 }
 
 .tarjeta {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
     text-align: center;
-    margin: 10px; /* Ajusta el margen según sea necesario */
-    padding: 10px; /* Ajusta el relleno según sea necesario */
-    border: 1px solid #ccc; /* Añade un borde para mayor claridad */
-  }
-  
-  /* Estilo específico para la imagen dentro de la tarjeta */
-  .tarjeta img {
-    max-width: 20%; /* La imagen no debe rebasar el ancho de su contenedor */
-    height: auto; /* Mantiene la proporción de la imagen */
-    display: block; /* Elimina el espacio adicional debajo de la imagen */
-    margin: 0 auto; /* Centra la imagen horizontalmente */
-  }
+    transition: transform 0.3s ease;
+}
+
+.tarjeta:hover {
+    transform: scale(1.05);
+}
+
+.tarjeta img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.tarjeta h2 {
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+.tarjeta p {
+    margin: 10px 0;
+}
+
+.boton-comprar {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.boton-comprar:hover {
+    background-color: #45a049;
+}
+
+.boton-comprar:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
+
+.boton-atras {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.boton-atras:hover {
+    background-color: #d32f2f;
+}

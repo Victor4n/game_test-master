@@ -1,33 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compras</title>
-  <link rel="stylesheet" href="compras.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda</title>
+    <link rel="stylesheet" href="compras.css">
 </head>
 <body>
-
-<div class="contenedor">
-  <h1>Tienda</h1>
-  <p id="puntajeCompra"><span id="puntosCompra"></span></p>
-  <a href="../index.html">Atrás</a>
-  <div class="tarjeta" id="articulo1">
-    <img src="https://images.vexels.com/media/users/3/202887/isolated/preview/f84d23c27349c292a9a0abefecc19ef1-iacute-cone-de-desenho-de-m-atilde-o-de-zumbi-by-vexels.png" alt="Artículo 1">
-    <h2>Mano de zombie</h2>
-    <p>Precio: 100 puntos</p>
-    <button onclick="comprar(100, 'articulo1')">Comprar</button>
-  </div>
-
-  <div class="tarjeta" id="articulo2">
-    <img src="https://i.pinimg.com/originals/83/a1/eb/83a1eb40f5e421b00f0be77b867e2591.png" alt="Artículo 2">
-    <h2>Mano de zombie edición PvZ</h2>
-    <p>Precio: 200 puntos</p>
-    <button onclick="comprar(200, 'articulo2')">Comprar</button>
-  </div>
-</div>
-
-<script src="compras.js"></script>
+    <div class="contenedor">
+        <h1>Tienda</h1>
+        <p id="puntosCompra">Puntaje actual: 0</p>
+        <div id="tiendaItems" class="grid-tienda">
+            <!-- Los items de la tienda se generarán dinámicamente aquí -->
+        </div>
+        <a href="../index.html" class="boton-atras">Atrás</a>
+    </div>
+    <script src="compras.js"></script>
 </body>
 </html>
-

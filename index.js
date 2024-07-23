@@ -57,6 +57,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Nuevo código para el indicador de logros
     crearIndicadorLogro();
     actualizarIconoLogros();
+
+    let circularLink = document.getElementById('circularLink');
+    
+    circularLink.addEventListener('click', function() {
+        // Reemplaza 'ruta/a/tu/nueva/pagina.html' con la ruta real de la nueva página
+        window.location.href = 'GrandesApuestas/GrandesApuestas.html';
+    });
 });
 
 function crearIndicadorLogro() {
