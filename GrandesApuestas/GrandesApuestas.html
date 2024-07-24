@@ -9,24 +9,31 @@
 <body>
     <div id="game-container">
         <h1>Grandes Apuestas</h1>
-        
+    
         <div id="setup-screen">
-            <button id="create-game">Crear Partida</button>
+            <h2>Crear Partida</h2>
+            <button id="create-game">Crear Nueva Partida</button>
+    
+            <h2>Unirse a Partida</h2>
             <div id="join-game-container">
-                <input type="text" id="game-id-input" placeholder="ID de la partida">
-                <button id="join-game">Unirse a Partida</button>
+                <input type="text" id="short-code-input" placeholder="Ingresa el código de 4 letras">
+                <button id="join-game">Unirse a la Partida</button>
+                <h3>Partidas Disponibles</h3>
+                <button id="refresh-games">Refrescar Lista</button>
+                <ul id="available-games-list"></ul>
             </div>
         </div>
-
+    
         <div id="waiting-room" style="display: none;">
             <h2>Sala de Espera</h2>
             <p>ID de la partida: <span id="game-id-display"></span></p>
+            <p>Código corto: <span id="short-code-display"></span></p>
             <p id="connection-status">Esperando conexión...</p>
             <button id="start-game" style="display: none;">Comenzar Partida</button>
         </div>
-
+    
         <div id="game-screen" style="display: none;">
-            <!-- El contenido del juego sigue siendo el mismo -->
+            <!-- Aquí irá el contenido del juego -->
         </div>
     </div>
 
