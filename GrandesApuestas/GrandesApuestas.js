@@ -1,105 +1,143 @@
 // Variables globales
+let peer;
+let conn;
 let isHost = false;
-let bluetoothDevice;
-let bluetoothServer;
-let bluetoothCharacteristic;
+let gameId;
 
 // Elementos del DOM
 const createGameBtn = document.getElementById('create-game');
+const joinGameContainer = document.getElementById('join-game-container');
 const joinGameBtn = document.getElementById('join-game');
+const gameIdInput = document.getElementById('game-id-input');
 const setupScreen = document.getElementById('setup-screen');
 const waitingRoom = document.getElementById('waiting-room');
 const gameScreen = document.getElementById('game-screen');
 const connectionStatus = document.getElementById('connection-status');
 const startGameBtn = document.getElementById('start-game');
+const gameIdDisplay = document.getElementById('game-id-display');
 
-// Configuración Bluetooth
-const SERVICE_UUID = '0000180f-0000-1000-8000-00805f9b34fb';
-const CHARACTERISTIC_UUID = '00002a19-0000-1000-8000-00805f9b34fb';
+// Inicializar Peer
+function initPeer() {
+    peer = new Peer();
+    
+    peer.on('open', (id) => {
+        console.log('Mi ID de peer es: ' + id);
+    });
 
-// Verificar soporte de Bluetooth
-if ('bluetooth' in navigator) {
-    console.log('Web Bluetooth API es soportada.');
-} else {
-    alert('Tu navegador no soporta Web Bluetooth API. Por favor, usa un navegador compatible como Chrome o Edge.');
+    peer.on('connection', (connection) => {
+        conn = connection;
+        setupConnectionListeners();
+        connectionStatus.textContent = 'Jugador conectado. Esperando para iniciar...';
+        startGameBtn.style.display = 'block';
+    });
+
+    peer.on('error', (err) => {
+        console.error('Error de peer:', err);
+        alert('Error de conexión. Por favor, intenta de nuevo.');
+    });
+}
+
+// Configurar listeners para la conexión
+function setupConnectionListeners() {
+    conn.on('data', (data) => {
+        console.log('Datos recibidos:', data);
+        handleGameData(data);
+    });
+
+    conn.on('close', () => {
+        alert('Conexión cerrada. El otro jugador se ha desconectado.');
+        resetGame();
+    });
 }
 
 // Crear juego (Host)
-createGameBtn.addEventListener('click', async () => {
-    try {
-        isHost = true;
+createGameBtn.addEventListener('click', () => {
+    isHost = true;
+    initPeer();
+    peer.on('open', (id) => {
+        gameId = id;
         setupScreen.style.display = 'none';
         waitingRoom.style.display = 'block';
+        gameIdDisplay.textContent = gameId;
         connectionStatus.textContent = 'Esperando que el otro jugador se conecte...';
-        startGameBtn.style.display = 'block'; // El host puede iniciar el juego
-    } catch (error) {
-        console.error('Error al crear el juego:', error);
-        alert('Error al crear el juego. Por favor, inténtalo de nuevo.');
-    }
+    });
+});
+
+// Mostrar opción para unirse al juego
+createGameBtn.addEventListener('click', () => {
+    joinGameContainer.style.display = 'block';
 });
 
 // Unirse a juego (Cliente)
-joinGameBtn.addEventListener('click', async () => {
-    try {
-        await connectToDevice();
-        isHost = false;
-        setupScreen.style.display = 'none';
-        waitingRoom.style.display = 'block';
-        connectionStatus.textContent = 'Conectado al anfitrión. Esperando que comience el juego...';
-    } catch (error) {
-        console.error('Error al unirse al juego:', error);
-        alert('Error al unirse al juego. Por favor, inténtalo de nuevo.');
+joinGameBtn.addEventListener('click', () => {
+    const joinId = gameIdInput.value.trim();
+    if (!joinId) {
+        alert('Por favor, ingresa un ID de partida válido.');
+        return;
+    }
+
+    isHost = false;
+    initPeer();
+    peer.on('open', () => {
+        conn = peer.connect(joinId);
+        conn.on('open', () => {
+            setupConnectionListeners();
+            setupScreen.style.display = 'none';
+            waitingRoom.style.display = 'block';
+            connectionStatus.textContent = 'Conectado al anfitrión. Esperando que comience el juego...';
+        });
+    });
+});
+
+// Iniciar el juego
+startGameBtn.addEventListener('click', () => {
+    if (isHost && conn) {
+        waitingRoom.style.display = 'none';
+        gameScreen.style.display = 'block';
+        conn.send({ type: 'gameStart' });
+        startGame();
     }
 });
 
-// Función para conectar al dispositivo (Cliente)
-async function connectToDevice() {
-    try {
-        bluetoothDevice = await navigator.bluetooth.requestDevice({
-            filters: [{ services: [SERVICE_UUID] }]
-        });
-        console.log('Dispositivo seleccionado:', bluetoothDevice.name);
-        
-        bluetoothServer = await bluetoothDevice.gatt.connect();
-        console.log('Conectado al servidor GATT');
-        
-        const service = await bluetoothServer.getPrimaryService(SERVICE_UUID);
-        console.log('Servicio encontrado');
-        
-        bluetoothCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
-        console.log('Característica encontrada');
-
-        await bluetoothCharacteristic.startNotifications();
-        bluetoothCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-        console.log('Notificaciones habilitadas');
-    } catch (error) {
-        console.error('Error al conectar:', error);
-        throw error;
-    }
-}
-
-// Manejar cambios en la característica Bluetooth
-function handleCharacteristicValueChanged(event) {
-    const value = new TextDecoder().decode(event.target.value);
-    console.log('Valor recibido:', value);
-    // Aquí puedes manejar los mensajes recibidos del otro jugador
-}
-
-// Función para enviar datos al otro jugador
-async function sendData(data) {
-    if (bluetoothCharacteristic) {
-        const encoder = new TextEncoder();
-        const dataArray = encoder.encode(data);
-        await bluetoothCharacteristic.writeValue(dataArray);
-        console.log('Datos enviados:', data);
+// Manejar datos del juego
+function handleGameData(data) {
+    switch (data.type) {
+        case 'gameStart':
+            waitingRoom.style.display = 'none';
+            gameScreen.style.display = 'block';
+            startGame();
+            break;
+        // Añade más casos según sea necesario para tu lógica de juego
     }
 }
 
 // Iniciar el juego
-startGameBtn.addEventListener('click', () => {
+function startGame() {
+    // Implementa la lógica inicial del juego aquí
+    console.log('El juego ha comenzado');
+}
+
+// Reiniciar el juego
+function resetGame() {
+    // Implementa la lógica para reiniciar el juego
+    setupScreen.style.display = 'block';
     waitingRoom.style.display = 'none';
-    gameScreen.style.display = 'block';
-    sendData('game_start');
-});
+    gameScreen.style.display = 'none';
+    joinGameContainer.style.display = 'none';
+    isHost = false;
+    if (conn) {
+        conn.close();
+    }
+    if (peer) {
+        peer.destroy();
+    }
+}
+
+// Función para enviar datos al otro jugador
+function sendGameData(data) {
+    if (conn && conn.open) {
+        conn.send(data);
+    }
+}
 
 // Aquí puedes añadir más funciones para manejar la lógica del juego

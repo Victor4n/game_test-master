@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grandes Apuestas - Bluetooth</title>
+    <title>Grandes Apuestas - Red Local</title>
     <link rel="stylesheet" href="grandesApuestas.css">
 </head>
 <body>
@@ -11,12 +11,16 @@
         <h1>Grandes Apuestas</h1>
         
         <div id="setup-screen">
-            <button id="create-game">Grandes Apuestas</button>
-            <button id="join-game">Unirse a Partida</button>
+            <button id="create-game">Crear Partida</button>
+            <div id="join-game-container" style="display: none;">
+                <input type="text" id="game-id-input" placeholder="ID de la partida">
+                <button id="join-game">Unirse a Partida</button>
+            </div>
         </div>
 
         <div id="waiting-room" style="display: none;">
             <h2>Sala de Espera</h2>
+            <p>ID de la partida: <span id="game-id-display"></span></p>
             <p id="connection-status">Esperando conexión...</p>
             <button id="start-game" style="display: none;">Comenzar Partida</button>
         </div>
@@ -26,6 +30,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
     <script src="grandesApuestas.js"></script>
 </body>
 </html>
