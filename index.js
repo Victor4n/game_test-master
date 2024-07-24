@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     circularLink.addEventListener('click', function() {
         // Reemplaza 'ruta/a/tu/nueva/pagina.html' con la ruta real de la nueva página
-        window.location.href = 'GrandesApuestas/GrandesApuestas.html';
+        window.location.href = 'GrandesApuestas/grandesApuestas.html';
     });
 });
 

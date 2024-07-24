@@ -1,264 +1,115 @@
-let jugadorActual = 1;
-let tiempoRestante = 30;
-let temporizador;
-let combinacionActual = ['','',''];
-let puntos = [0, 0];
-let codigoPartida = '';
-let modoJuego = ''; // 'creador' o 'invitado'
-let fasePPT = true;
-let seleccionPPT = '';
-let jugadoresListos = [false, false];
+// Variables globales
+let isHost = false;
+let bluetoothDevice;
+let bluetoothServer;
+let bluetoothCharacteristic;
 
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('crearPartida').addEventListener('click', crearPartida);
-    document.getElementById('unirsePartida').addEventListener('click', unirsePartida);
-    document.getElementById('listo').addEventListener('click', jugadorListo);
-    document.getElementById('finalizar').addEventListener('click', finalizarTurno);
+// Elementos del DOM
+const createGameBtn = document.getElementById('create-game');
+const joinGameBtn = document.getElementById('join-game');
+const setupScreen = document.getElementById('setup-screen');
+const waitingRoom = document.getElementById('waiting-room');
+const gameScreen = document.getElementById('game-screen');
+const connectionStatus = document.getElementById('connection-status');
+const startGameBtn = document.getElementById('start-game');
 
-    document.querySelectorAll('.ppt').forEach(boton => {
-        boton.addEventListener('click', seleccionarPPT);
-    });
+// Configuración Bluetooth
+const SERVICE_UUID = '0000180f-0000-1000-8000-00805f9b34fb'; // Usando un UUID de servicio estándar como ejemplo
+const CHARACTERISTIC_UUID = '00002a19-0000-1000-8000-00805f9b34fb'; // Usando un UUID de característica estándar como ejemplo
 
-    document.querySelectorAll('.casilla').forEach(casilla => {
-        casilla.addEventListener('click', seleccionarCasilla);
-    });
-
-    // Verificar si hay un código de partida en la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const codigoEnURL = urlParams.get('codigo');
-    if (codigoEnURL) {
-        document.getElementById('codigoUnirse').value = codigoEnURL;
-        unirsePartida();
+// Crear juego (Host)
+createGameBtn.addEventListener('click', async () => {
+    try {
+        await advertiseDevice();
+        isHost = true;
+        setupScreen.style.display = 'none';
+        waitingRoom.style.display = 'block';
+        connectionStatus.textContent = 'Esperando que el otro jugador se conecte...';
+    } catch (error) {
+        console.error('Error al crear el juego:', error);
+        alert('Error al crear el juego. Por favor, inténtalo de nuevo.');
     }
 });
 
-function crearPartida() {
-    const monto = document.getElementById('montoApuesta').value;
-    const nickname = document.getElementById('nickname').value;
-    if (monto % 100 !== 0 || monto < 300) {
-        alert('El monto debe ser múltiplo de 100 y mayor o igual a 300');
-        return;
+// Unirse a juego (Cliente)
+joinGameBtn.addEventListener('click', async () => {
+    try {
+        await connectToDevice();
+        isHost = false;
+        setupScreen.style.display = 'none';
+        waitingRoom.style.display = 'block';
+        connectionStatus.textContent = 'Conectado al anfitrión. Esperando que comience el juego...';
+    } catch (error) {
+        console.error('Error al unirse al juego:', error);
+        alert('Error al unirse al juego. Por favor, inténtalo de nuevo.');
     }
-    if (!nickname) {
-        alert('Por favor, ingresa un nickname');
-        return;
-    }
-    codigoPartida = Math.random().toString(36).substr(2, 6).toUpperCase();
-    modoJuego = 'creador';
-    
-    // Crear URL con el código de partida
-    const nuevaURL = `${window.location.origin}${window.location.pathname}?codigo=${codigoPartida}`;
-    
-    // Mostrar el código y la URL para compartir
-    alert(`Tu código de partida es: ${codigoPartida}\nComparte esta URL con tu oponente: ${nuevaURL}`);
-    
-    const partidaInfo = {
-        codigo: codigoPartida,
-        monto: monto,
-        jugadores: [nickname, ''],
-        jugadorActual: 1
-    };
-    localStorage.setItem('partidaGrandesApuestas', JSON.stringify(partidaInfo));
-    mostrarSalaEspera();
-}
+});
 
-function unirsePartida() {
-    const codigo = document.getElementById('codigoUnirse').value.toUpperCase();
-    const nickname = document.getElementById('nickname').value;
-    if (!nickname) {
-        alert('Por favor, ingresa un nickname');
-        return;
-    }
-    
-    // Verificar si existe una partida con ese código
-    const partidaGuardada = JSON.parse(localStorage.getItem('partidaGrandesApuestas'));
-    if (partidaGuardada && partidaGuardada.codigo === codigo) {
-        codigoPartida = codigo;
-        modoJuego = 'invitado';
-        partidaGuardada.jugadores[1] = nickname;
-        localStorage.setItem('partidaGrandesApuestas', JSON.stringify(partidaGuardada));
-        mostrarSalaEspera();
-    } else {
-        // Si no existe localmente, crear una nueva partida como invitado
-        const nuevaPartida = {
-            codigo: codigo,
-            monto: 0, // El monto se actualizará cuando el creador inicie la partida
-            jugadores: ['', nickname],
-            jugadorActual: 1
-        };
-        localStorage.setItem('partidaGrandesApuestas', JSON.stringify(nuevaPartida));
-        modoJuego = 'invitado';
-        mostrarSalaEspera();
+// Función para anunciar el dispositivo (Host)
+async function advertiseDevice() {
+    try {
+        console.log('Anunciando dispositivo...');
+    } catch (error) {
+        console.error('Error al anunciar el dispositivo:', error);
+        throw error;
     }
 }
 
-function mostrarSalaEspera() {
-    document.getElementById('inicio').style.display = 'none';
-    document.getElementById('salaEspera').style.display = 'block';
-    actualizarSalaEspera();
-}
+// Función para conectar al dispositivo (Cliente)
+async function connectToDevice() {
+    try {
+        bluetoothDevice = await navigator.bluetooth.requestDevice({
+            filters: [{ services: [SERVICE_UUID] }]
+        });
+        console.log('Dispositivo seleccionado:', bluetoothDevice.name);
+        
+        const server = await bluetoothDevice.gatt.connect();
+        bluetoothServer = server;
+        console.log('Conectado al servidor GATT');
+        
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        console.log('Servicio encontrado');
+        
+        bluetoothCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+        console.log('Característica encontrada');
 
-function actualizarSalaEspera() {
-    const partidaGuardada = JSON.parse(localStorage.getItem('partidaGrandesApuestas'));
-    document.getElementById('codigoPartida').textContent = `Código de partida: ${partidaGuardada.codigo}`;
-    document.getElementById('jugador1').textContent = `Jugador 1: ${partidaGuardada.jugadores[0] || 'Esperando...'} ${jugadoresListos[0] ? '(Listo)' : ''}`;
-    document.getElementById('jugador2').textContent = `Jugador 2: ${partidaGuardada.jugadores[1] || 'Esperando...'} ${jugadoresListos[1] ? '(Listo)' : ''}`;
-}
-
-// ... (el resto del código permanece igual)
-function jugadorListo() {
-    const jugadorIndex = modoJuego === 'creador' ? 0 : 1;
-    jugadoresListos[jugadorIndex] = true;
-    const partidaGuardada = JSON.parse(localStorage.getItem('partidaGrandesApuestas'));
-    partidaGuardada.jugadoresListos = jugadoresListos;
-    localStorage.setItem('partidaGrandesApuestas', JSON.stringify(partidaGuardada));
-    actualizarSalaEspera();
-    verificarInicioJuego();
-}
-
-function verificarInicioJuego() {
-    const partidaGuardada = JSON.parse(localStorage.getItem('partidaGrandesApuestas'));
-    if (partidaGuardada.jugadoresListos && partidaGuardada.jugadoresListos.every(listo => listo)) {
-        iniciarJuego();
+        // Habilitar notificaciones
+        await bluetoothCharacteristic.startNotifications();
+        bluetoothCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+        console.log('Notificaciones habilitadas');
+        
+        startGameBtn.style.display = 'block';
+    } catch (error) {
+        console.error('Error al conectar:', error);
+        throw error;
     }
 }
 
-function iniciarJuego() {
-    document.getElementById('salaEspera').style.display = 'none';
-    document.getElementById('juego').style.display = 'block';
-    document.getElementById('piedrapapeltijera').style.display = 'block';
-    actualizarInterfaz();
+// Manejar cambios en la característica Bluetooth
+function handleCharacteristicValueChanged(event) {
+    const value = new TextDecoder().decode(event.target.value);
+    console.log('Valor recibido:', value);
+    // Aquí puedes manejar los mensajes recibidos del otro jugador
+    // Por ejemplo, actualizar el estado del juego, mover fichas, etc.
 }
 
-function seleccionarPPT(event) {
-    if (!fasePPT) return;
-    seleccionPPT = event.target.dataset.opcion;
-    document.getElementById('piedrapapeltijera').style.display = 'none';
-    document.getElementById('mensaje').textContent = 'Esperando al otro jugador...';
-    
-    if (modoJuego === 'creador') {
-        localStorage.setItem('seleccionPPTCreador', seleccionPPT);
-    } else {
-        const seleccionCreador = localStorage.getItem('seleccionPPTCreador');
-        determinarGanadorPPT(seleccionCreador, seleccionPPT);
+// Función para enviar datos al otro jugador
+async function sendData(data) {
+    if (bluetoothCharacteristic) {
+        const encoder = new TextEncoder();
+        const dataArray = encoder.encode(data);
+        await bluetoothCharacteristic.writeValue(dataArray);
+        console.log('Datos enviados:', data);
     }
 }
 
-function determinarGanadorPPT(seleccion1, seleccion2) {
-    const resultado = (seleccion1 === seleccion2) ? 'empate' :
-        (seleccion1 === 'piedra' && seleccion2 === 'tijera') ||
-        (seleccion1 === 'papel' && seleccion2 === 'piedra') ||
-        (seleccion1 === 'tijera' && seleccion2 === 'papel') ? 'gana1' : 'gana2';
+// Iniciar el juego
+startGameBtn.addEventListener('click', () => {
+    waitingRoom.style.display = 'none';
+    gameScreen.style.display = 'block';
+    // Aquí puedes inicializar el estado del juego y enviar un mensaje al otro jugador
+    sendData('game_start');
+});
 
-    if (resultado === 'empate') {
-        document.getElementById('mensaje').textContent = 'Empate en PPT. Vuelvan a jugar.';
-        document.getElementById('piedrapapeltijera').style.display = 'block';
-    } else {
-        fasePPT = false;
-        jugadorActual = resultado === 'gana1' ? 1 : 2;
-        const partidaGuardada = JSON.parse(localStorage.getItem('partidaGrandesApuestas'));
-        partidaGuardada.jugadorActual = jugadorActual;
-        localStorage.setItem('partidaGrandesApuestas', JSON.stringify(partidaGuardada));
-        iniciarTurno();
-    }
-}
-
-function iniciarTurno() {
-    reiniciarTablero();
-    actualizarInterfaz();
-    iniciarTemporizador();
-}
-
-function reiniciarTablero() {
-    document.querySelectorAll('.casilla').forEach(casilla => {
-        casilla.style.backgroundImage = 'url("carta-reverso.jpg")';
-        casilla.dataset.valor = '';
-    });
-    combinacionActual = ['','',''];
-}
-
-function actualizarInterfaz() {
-    const partidaGuardada = JSON.parse(localStorage.getItem('partidaGrandesApuestas'));
-    document.getElementById('jugadorActual').textContent = `Turno del Jugador ${partidaGuardada.jugadorActual}`;
-    document.getElementById('puntajeJ1').textContent = puntos[0];
-    document.getElementById('puntajeJ2').textContent = puntos[1];
-}
-
-function iniciarTemporizador() {
-    tiempoRestante = 30;
-    clearInterval(temporizador);
-    temporizador = setInterval(() => {
-        tiempoRestante--;
-        document.getElementById('temporizador').textContent = `Tiempo restante: ${tiempoRestante}s`;
-        if (tiempoRestante <= 0) {
-            clearInterval(temporizador);
-            finalizarTurnoAutomatico();
-        }
-    }, 1000);
-}
-
-function finalizarTurnoAutomatico() {
-    // Si el jugador no ha completado su combinación, se genera una aleatoria
-    while (combinacionActual.includes('')) {
-        const opciones = ['piedra', 'papel', 'tijera'];
-        const indiceVacio = combinacionActual.findIndex(c => c === '');
-        const opcionAleatoria = opciones[Math.floor(Math.random() * opciones.length)];
-        combinacionActual[indiceVacio] = opcionAleatoria;
-        document.querySelectorAll('.casilla')[indiceVacio].style.backgroundImage = `url('${opcionAleatoria}.jpg')`;
-    }
-    finalizarTurno();
-}
-
-function seleccionarCasilla(event) {
-    const index = event.target.dataset.index;
-    const partidaGuardada = JSON.parse(localStorage.getItem('partidaGrandesApuestas'));
-    
-    if (
-        (modoJuego === 'creador' && partidaGuardada.jugadorActual !== 1) ||
-        (modoJuego === 'invitado' && partidaGuardada.jugadorActual !== 2)
-    ) {
-        return; // No es el turno de este jugador
-    }
-
-    if (combinacionActual[index] === '') {
-        const opciones = ['piedra', 'papel', 'tijera'];
-        const opcionSeleccionada = opciones.find(opcion => !combinacionActual.includes(opcion));
-        if (opcionSeleccionada) {
-            event.target.style.backgroundImage = `url('${opcionSeleccionada}.jpg')`;
-            combinacionActual[index] = opcionSeleccionada;
-        }
-    }
-}
-
-function finalizarTurno() {
-    clearInterval(temporizador);
-    if (combinacionActual.includes('')) {
-        alert('Debes completar todas las casillas antes de finalizar el turno');
-        return;
-    }
-
-    const partidaGuardada = JSON.parse(localStorage.getItem('partidaGrandesApuestas'));
-    
-    if (modoJuego === 'creador' && partidaGuardada.jugadorActual === 1) {
-        localStorage.setItem('combinacionJugador1', JSON.stringify(combinacionActual));
-        cambiarJugador();
-    } else if (modoJuego === 'invitado' && partidaGuardada.jugadorActual === 2) {
-        const combinacionJugador1 = JSON.parse(localStorage.getItem('combinacionJugador1'));
-        verificarCombinacion(combinacionJugador1, combinacionActual);
-    }
-}
-
-function verificarCombinacion(combinacion1, combinacion2) {
-    if (JSON.stringify(combinacion1) === JSON.stringify(combinacion2)) {
-        puntos[1]++;
-        document.getElementById('mensaje').textContent = '¡Jugador 2 adivinó la combinación!';
-    } else {
-        document.getElementById('mensaje').textContent = 'Jugador 2 no adivinó la combinación.';
-    }
-    
-    if (puntos[1] === 2) {
-        finalizarJuego(2);
-    } else {
-        cambiarJugador();
-    }
-}
+// Aquí puedes añadir más funciones para manejar la lógica del juego,
+// como colocar fichas, manejar turnos, etc.

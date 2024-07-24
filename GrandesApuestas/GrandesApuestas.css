@@ -8,52 +8,69 @@ body {
     background-color: #f0f0f0;
 }
 
-#inicio, #juego {
-    text-align: center;
+#game-container {
     background-color: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+h1, h2, h3 {
+    text-align: center;
+}
+
 input, button {
-    margin: 10px;
+    display: block;
+    width: 100%;
+    margin: 10px 0;
     padding: 10px;
     font-size: 16px;
 }
 
-#tablero {
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.card-slots {
     display: flex;
     justify-content: space-around;
-    margin-top: 20px;
+    margin: 20px 0;
 }
 
-.casillas {
-    display: flex;
-}
-
-.casilla {
+.card-slot {
     width: 100px;
     height: 150px;
-    border: 2px solid #000;
-    margin: 0 10px;
-    background-image: url('carta-reverso.jpg');
-    background-size: cover;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
 }
 
-.ppt {
-    width: 80px;
-    height: 80px;
-    margin: 10px;
-    cursor: move;
+.button-container {
+    display: flex;
+    justify-content: space-around;
 }
 
-#temporizador {
-    font-size: 24px;
+.game-button {
+    width: 30%;
+}
+
+#finish-turn {
     margin-top: 20px;
 }
 
-#mensaje {
+#game-info {
     margin-top: 20px;
-    font-weight: bold;
+    text-align: center;
+}
+
+#player-area, #opponent-area {
+    margin-bottom: 30px;
 }

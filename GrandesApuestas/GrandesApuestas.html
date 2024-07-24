@@ -3,61 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grandes Apuestas</title>
-    <link rel="stylesheet" href="GrandesApuestas.css">
+    <title>Grandes Apuestas - Bluetooth</title>
+    <link rel="stylesheet" href="grandesApuestas.css">
 </head>
 <body>
-    <div id="inicio">
+    <div id="game-container">
         <h1>Grandes Apuestas</h1>
-        <input type="number" id="montoApuesta" placeholder="Monto de apuesta (300, 400, 500, ...)" step="100" min="300">
-        <input type="text" id="nickname" placeholder="Tu nickname">
-        <button id="crearPartida">Crear Partida</button>
-        <input type="text" id="codigoUnirse" placeholder="Código de partida">
-        <button id="unirsePartida">Unirse a Partida</button>
+        
+        <div id="setup-screen">
+            <button id="create-game">Grandes Apuestas</button>
+            <button id="join-game">Unirse a Partida</button>
+        </div>
+
+        <div id="waiting-room" style="display: none;">
+            <h2>Sala de Espera</h2>
+            <p id="connection-status">Esperando conexión...</p>
+            <button id="start-game" style="display: none;">Comenzar Partida</button>
+        </div>
+
+        <div id="game-screen" style="display: none;">
+            <!-- El contenido del juego sigue siendo el mismo -->
+        </div>
     </div>
 
-    <div id="salaEspera" style="display:none;">
-        <h2>Sala de Espera</h2>
-        <div id="codigoPartida"></div>
-        <div id="jugadores">
-            <div id="jugador1"></div>
-            <div id="jugador2"></div>
-        </div>
-        <button id="listo">Listo</button>
-    </div>
-
-    <div id="juego" style="display:none;">
-        <div id="infoJuego">
-            <div id="jugadorActual"></div>
-            <div id="puntajes">
-                <div>Jugador 1: <span id="puntajeJ1">0</span></div>
-                <div>Jugador 2: <span id="puntajeJ2">0</span></div>
-            </div>
-            <div id="temporizador"></div>
-        </div>
-
-        <div id="piedrapapeltijera" style="display:none;">
-            <h2>Piedra, Papel o Tijera para decidir quién empieza</h2>
-            <button class="ppt" data-opcion="piedra">Piedra</button>
-            <button class="ppt" data-opcion="papel">Papel</button>
-            <button class="ppt" data-opcion="tijera">Tijera</button>
-        </div>
-
-        <div id="tablero">
-            <div id="casillasJugador" class="casillas">
-                <div class="casilla" data-index="0"></div>
-                <div class="casilla" data-index="1"></div>
-                <div class="casilla" data-index="2"></div>
-            </div>
-        </div>
-
-        <div id="controles">
-            <button id="finalizar">Finalizar Turno</button>
-        </div>
-
-        <div id="mensaje"></div>
-    </div>
-
-    <script src="GrandesApuestas.js"></script>
+    <script src="grandesApuestas.js"></script>
 </body>
 </html>
