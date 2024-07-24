@@ -1,113 +1,143 @@
 // Variables globales
-let peer;
-let conn;
+let localPeerConnection;
+let dataChannel;
 let isHost = false;
 let gameId;
-let shortCode;
+const broadcastChannel = new BroadcastChannel('game_discovery');
 
 // Elementos del DOM
 const createGameBtn = document.getElementById('create-game');
 const joinGameBtn = document.getElementById('join-game');
-const shortCodeInput = document.getElementById('short-code-input');
 const setupScreen = document.getElementById('setup-screen');
 const waitingRoom = document.getElementById('waiting-room');
 const gameScreen = document.getElementById('game-screen');
 const connectionStatus = document.getElementById('connection-status');
 const startGameBtn = document.getElementById('start-game');
 const gameIdDisplay = document.getElementById('game-id-display');
-const shortCodeDisplay = document.getElementById('short-code-display');
 const availableGamesList = document.getElementById('available-games-list');
 const refreshGamesBtn = document.getElementById('refresh-games');
 
-// Inicializar Peer
-function initPeer() {
-    peer = new Peer();
-    
-    peer.on('open', (id) => {
-        console.log('Mi ID de peer es: ' + id);
-        if (isHost) {
-            gameId = id;
-            shortCode = generateShortCode();
-            gameIdDisplay.textContent = gameId;
-            shortCodeDisplay.textContent = shortCode;
-            addGameToLocalLobby(shortCode, gameId);
-        }
-    });
-
-    peer.on('connection', (connection) => {
-        conn = connection;
-        setupConnectionListeners();
-        connectionStatus.textContent = 'Jugador conectado. Esperando para iniciar...';
-        startGameBtn.style.display = 'block';
-    });
-
-    peer.on('error', (err) => {
-        console.error('Error de peer:', err);
-        alert('Error de conexión. Por favor, intenta de nuevo.');
-    });
-}
-
-// Configurar listeners para la conexión
-function setupConnectionListeners() {
-    conn.on('data', (data) => {
-        console.log('Datos recibidos:', data);
-        handleGameData(data);
-    });
-
-    conn.on('close', () => {
-        alert('Conexión cerrada. El otro jugador se ha desconectado.');
-        resetGame();
-    });
-}
+// Configuración de WebRTC
+const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]};
 
 // Crear juego (Host)
 createGameBtn.addEventListener('click', () => {
     isHost = true;
-    initPeer();
+    gameId = generateGameId();
+    initializePeerConnection();
     setupScreen.style.display = 'none';
     waitingRoom.style.display = 'block';
     connectionStatus.textContent = 'Esperando que el otro jugador se conecte...';
+    gameIdDisplay.textContent = gameId;
+    broadcastGame();
 });
 
 // Refrescar lista de juegos disponibles
-refreshGamesBtn.addEventListener('click', refreshAvailableGames);
+refreshGamesBtn.addEventListener('click', requestAvailableGames);
 
 // Unirse a juego (Cliente)
 joinGameBtn.addEventListener('click', () => {
-    const code = shortCodeInput.value.trim().toUpperCase();
-    if (!code) {
-        alert('Por favor, ingresa un código de juego válido.');
+    const selectedGame = document.querySelector('input[name="available-game"]:checked');
+    if (!selectedGame) {
+        alert('Por favor, selecciona un juego disponible.');
         return;
     }
 
-    const gameId = getGameIdFromShortCode(code);
-    if (!gameId) {
-        alert('No se encontró ningún juego con ese código.');
-        return;
-    }
-
+    gameId = selectedGame.value;
     isHost = false;
-    initPeer();
-    peer.on('open', () => {
-        conn = peer.connect(gameId);
-        conn.on('open', () => {
-            setupConnectionListeners();
-            setupScreen.style.display = 'none';
-            waitingRoom.style.display = 'block';
-            connectionStatus.textContent = 'Conectado al anfitrión. Esperando que comience el juego...';
-        });
-    });
+    initializePeerConnection();
+    setupScreen.style.display = 'none';
+    waitingRoom.style.display = 'block';
+    connectionStatus.textContent = 'Conectando al anfitrión...';
+    sendJoinRequest(gameId);
 });
 
-// Iniciar el juego
-startGameBtn.addEventListener('click', () => {
-    if (isHost && conn) {
-        waitingRoom.style.display = 'none';
-        gameScreen.style.display = 'block';
-        conn.send({ type: 'gameStart' });
-        startGame();
+// Inicializar conexión peer
+function initializePeerConnection() {
+    localPeerConnection = new RTCPeerConnection(configuration);
+    
+    localPeerConnection.onicecandidate = event => {
+        if (event.candidate) {
+            broadcastChannel.postMessage({
+                type: 'ice-candidate',
+                candidate: event.candidate,
+                gameId: gameId
+            });
+        }
+    };
+
+    if (isHost) {
+        dataChannel = localPeerConnection.createDataChannel('gameChannel');
+        setupDataChannel();
+    } else {
+        localPeerConnection.ondatachannel = event => {
+            dataChannel = event.channel;
+            setupDataChannel();
+        };
     }
-});
+}
+
+// Configurar canal de datos
+function setupDataChannel() {
+    dataChannel.onopen = () => {
+        console.log('Data channel is open');
+        connectionStatus.textContent = 'Conectado. Listo para jugar.';
+        if (isHost) {
+            startGameBtn.style.display = 'block';
+        }
+    };
+
+    dataChannel.onmessage = event => {
+        console.log('Mensaje recibido:', event.data);
+        handleGameData(JSON.parse(event.data));
+    };
+}
+
+// Generar ID de juego
+function generateGameId() {
+    return Math.random().toString(36).substr(2, 6).toUpperCase();
+}
+
+// Broadcast del juego
+function broadcastGame() {
+    broadcastChannel.postMessage({
+        type: 'new-game',
+        gameId: gameId
+    });
+}
+
+// Solicitar juegos disponibles
+function requestAvailableGames() {
+    broadcastChannel.postMessage({type: 'request-games'});
+    setTimeout(updateAvailableGamesList, 1000); // Esperar respuestas por 1 segundo
+}
+
+// Actualizar lista de juegos disponibles
+function updateAvailableGamesList() {
+    availableGamesList.innerHTML = '';
+    for (let [id, game] of availableGames) {
+        const li = document.createElement('li');
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'available-game';
+        radio.value = id;
+        radio.id = `game-${id}`;
+        const label = document.createElement('label');
+        label.htmlFor = `game-${id}`;
+        label.textContent = `Partida ${id}`;
+        li.appendChild(radio);
+        li.appendChild(label);
+        availableGamesList.appendChild(li);
+    }
+}
+
+// Enviar solicitud de unión
+function sendJoinRequest(gameId) {
+    broadcastChannel.postMessage({
+        type: 'join-request',
+        gameId: gameId
+    });
+}
 
 // Manejar datos del juego
 function handleGameData(data) {
@@ -123,89 +153,78 @@ function handleGameData(data) {
 
 // Iniciar el juego
 function startGame() {
-    // Implementa la lógica inicial del juego aquí
     console.log('El juego ha comenzado');
-}
-
-// Reiniciar el juego
-function resetGame() {
-    setupScreen.style.display = 'block';
-    waitingRoom.style.display = 'none';
-    gameScreen.style.display = 'none';
-    isHost = false;
-    if (conn) {
-        conn.close();
+    if (isHost) {
+        dataChannel.send(JSON.stringify({type: 'gameStart'}));
     }
-    if (peer) {
-        peer.destroy();
+    // Implementa aquí la lógica inicial del juego
+}
+
+// Manejo de mensajes de Broadcast Channel
+broadcastChannel.onmessage = async (event) => {
+    const message = event.data;
+    switch (message.type) {
+        case 'new-game':
+            if (!isHost) {
+                availableGames.set(message.gameId, {timestamp: Date.now()});
+            }
+            break;
+        case 'request-games':
+            if (isHost) {
+                broadcastChannel.postMessage({
+                    type: 'new-game',
+                    gameId: gameId
+                });
+            }
+            break;
+        case 'join-request':
+            if (isHost && message.gameId === gameId) {
+                const offer = await localPeerConnection.createOffer();
+                await localPeerConnection.setLocalDescription(offer);
+                broadcastChannel.postMessage({
+                    type: 'offer',
+                    offer: offer,
+                    gameId: gameId
+                });
+            }
+            break;
+        case 'offer':
+            if (!isHost && message.gameId === gameId) {
+                await localPeerConnection.setRemoteDescription(message.offer);
+                const answer = await localPeerConnection.createAnswer();
+                await localPeerConnection.setLocalDescription(answer);
+                broadcastChannel.postMessage({
+                    type: 'answer',
+                    answer: answer,
+                    gameId: gameId
+                });
+            }
+            break;
+        case 'answer':
+            if (isHost && message.gameId === gameId) {
+                await localPeerConnection.setRemoteDescription(message.answer);
+            }
+            break;
+        case 'ice-candidate':
+            if (message.gameId === gameId) {
+                await localPeerConnection.addIceCandidate(message.candidate);
+            }
+            break;
     }
-    removeGameFromLocalLobby(shortCode);
-    refreshAvailableGames();
-}
+};
 
-// Función para enviar datos al otro jugador
-function sendGameData(data) {
-    if (conn && conn.open) {
-        conn.send(data);
-    }
-}
-
-// Generar código corto
-function generateShortCode() {
-    return Math.random().toString(36).substr(2, 4).toUpperCase();
-}
-
-// Añadir juego al lobby local
-function addGameToLocalLobby(shortCode, gameId) {
-    const games = JSON.parse(localStorage.getItem('availableGames') || '{}');
-    games[shortCode] = {
-        id: gameId,
-        timestamp: Date.now()
-    };
-    localStorage.setItem('availableGames', JSON.stringify(games));
-}
-
-// Remover juego del lobby local
-function removeGameFromLocalLobby(shortCode) {
-    const games = JSON.parse(localStorage.getItem('availableGames') || '{}');
-    delete games[shortCode];
-    localStorage.setItem('availableGames', JSON.stringify(games));
-}
-
-// Obtener ID de juego a partir del código corto
-function getGameIdFromShortCode(shortCode) {
-    const games = JSON.parse(localStorage.getItem('availableGames') || '{}');
-    return games[shortCode] ? games[shortCode].id : null;
-}
-
-// Refrescar lista de juegos disponibles
-function refreshAvailableGames() {
-    const games = JSON.parse(localStorage.getItem('availableGames') || '{}');
-    const currentTime = Date.now();
-    const gameList = Object.entries(games)
-        .filter(([_, game]) => currentTime - game.timestamp < 300000) // 5 minutos
-        .map(([shortCode, _]) => shortCode);
-    
-    availableGamesList.innerHTML = '';
-    gameList.forEach(code => {
-        const li = document.createElement('li');
-        li.textContent = code;
-        li.onclick = () => {
-            shortCodeInput.value = code;
-        };
-        availableGamesList.appendChild(li);
-    });
-}
+// Mapa para almacenar juegos disponibles
+const availableGames = new Map();
 
 // Limpiar juegos antiguos periódicamente
 setInterval(() => {
-    const games = JSON.parse(localStorage.getItem('availableGames') || '{}');
-    const currentTime = Date.now();
-    const updatedGames = Object.fromEntries(
-        Object.entries(games).filter(([_, game]) => currentTime - game.timestamp < 300000)
-    );
-    localStorage.setItem('availableGames', JSON.stringify(updatedGames));
-}, 60000); // Cada minuto
+    const now = Date.now();
+    for (let [id, game] of availableGames) {
+        if (now - game.timestamp > 60000) { // 1 minuto
+            availableGames.delete(id);
+        }
+    }
+}, 30000); // Cada 30 segundos
 
 // Inicializar
-refreshAvailableGames();
+requestAvailableGames();

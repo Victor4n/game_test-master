@@ -16,18 +16,16 @@
     
             <h2>Unirse a Partida</h2>
             <div id="join-game-container">
-                <input type="text" id="short-code-input" placeholder="Ingresa el código de 4 letras">
-                <button id="join-game">Unirse a la Partida</button>
                 <h3>Partidas Disponibles</h3>
                 <button id="refresh-games">Refrescar Lista</button>
                 <ul id="available-games-list"></ul>
+                <button id="join-game">Unirse a la Partida Seleccionada</button>
             </div>
         </div>
     
         <div id="waiting-room" style="display: none;">
             <h2>Sala de Espera</h2>
             <p>ID de la partida: <span id="game-id-display"></span></p>
-            <p>Código corto: <span id="short-code-display"></span></p>
             <p id="connection-status">Esperando conexión...</p>
             <button id="start-game" style="display: none;">Comenzar Partida</button>
         </div>
