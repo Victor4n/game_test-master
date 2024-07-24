@@ -10,30 +10,36 @@
     <div id="game-container">
         <h1>Grandes Apuestas</h1>
     
-        <div id="setup-screen">
-            <h2>Crear Partida</h2>
-            <button id="create-game">Crear Nueva Partida</button>
-    
-            <h2>Unirse a Partida</h2>
-            <div id="join-game-container">
-                <h3>Partidas Disponibles</h3>
-                <button id="refresh-games">Refrescar Lista</button>
-                <ul id="available-games-list"></ul>
-                <button id="join-game">Unirse a la Partida Seleccionada</button>
+        <div id="game-container">
+            <h1>Grandes Apuestas</h1>
+        
+            <div id="setup-screen">
+                <h2>Crear Partida</h2>
+                <button id="create-game">Crear Nueva Partida</button>
+        
+                <h2>Unirse a Partida</h2>
+                <div id="join-game-container">
+                    <input type="text" id="game-code-input" placeholder="Introduce el código de la partida">
+                    <button id="join-game-by-code">Unirse por Código</button>
+                    
+                    <h3>O elige una partida disponible:</h3>
+                    <button id="refresh-games">Refrescar Lista</button>
+                    <ul id="available-games-list"></ul>
+                    <button id="join-game">Unirse a la Partida Seleccionada</button>
+                </div>
+            </div>
+        
+            <div id="waiting-room" style="display: none;">
+                <h2>Sala de Espera</h2>
+                <p>ID de la partida: <span id="game-id-display"></span></p>
+                <p id="connection-status">Esperando conexión...</p>
+                <button id="start-game" style="display: none;">Comenzar Partida</button>
+            </div>
+        
+            <div id="game-screen" style="display: none;">
+                <!-- Aquí irá el contenido del juego -->
             </div>
         </div>
-    
-        <div id="waiting-room" style="display: none;">
-            <h2>Sala de Espera</h2>
-            <p>ID de la partida: <span id="game-id-display"></span></p>
-            <p id="connection-status">Esperando conexión...</p>
-            <button id="start-game" style="display: none;">Comenzar Partida</button>
-        </div>
-    
-        <div id="game-screen" style="display: none;">
-            <!-- Aquí irá el contenido del juego -->
-        </div>
-    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
     <script src="grandesApuestas.js"></script>
