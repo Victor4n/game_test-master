@@ -14,17 +14,24 @@ const connectionStatus = document.getElementById('connection-status');
 const startGameBtn = document.getElementById('start-game');
 
 // Configuración Bluetooth
-const SERVICE_UUID = '0000180f-0000-1000-8000-00805f9b34fb'; // Usando un UUID de servicio estándar como ejemplo
-const CHARACTERISTIC_UUID = '00002a19-0000-1000-8000-00805f9b34fb'; // Usando un UUID de característica estándar como ejemplo
+const SERVICE_UUID = '0000180f-0000-1000-8000-00805f9b34fb';
+const CHARACTERISTIC_UUID = '00002a19-0000-1000-8000-00805f9b34fb';
+
+// Verificar soporte de Bluetooth
+if ('bluetooth' in navigator) {
+    console.log('Web Bluetooth API es soportada.');
+} else {
+    alert('Tu navegador no soporta Web Bluetooth API. Por favor, usa un navegador compatible como Chrome o Edge.');
+}
 
 // Crear juego (Host)
 createGameBtn.addEventListener('click', async () => {
     try {
-        await advertiseDevice();
         isHost = true;
         setupScreen.style.display = 'none';
         waitingRoom.style.display = 'block';
         connectionStatus.textContent = 'Esperando que el otro jugador se conecte...';
+        startGameBtn.style.display = 'block'; // El host puede iniciar el juego
     } catch (error) {
         console.error('Error al crear el juego:', error);
         alert('Error al crear el juego. Por favor, inténtalo de nuevo.');
@@ -45,16 +52,6 @@ joinGameBtn.addEventListener('click', async () => {
     }
 });
 
-// Función para anunciar el dispositivo (Host)
-async function advertiseDevice() {
-    try {
-        console.log('Anunciando dispositivo...');
-    } catch (error) {
-        console.error('Error al anunciar el dispositivo:', error);
-        throw error;
-    }
-}
-
 // Función para conectar al dispositivo (Cliente)
 async function connectToDevice() {
     try {
@@ -63,22 +60,18 @@ async function connectToDevice() {
         });
         console.log('Dispositivo seleccionado:', bluetoothDevice.name);
         
-        const server = await bluetoothDevice.gatt.connect();
-        bluetoothServer = server;
+        bluetoothServer = await bluetoothDevice.gatt.connect();
         console.log('Conectado al servidor GATT');
         
-        const service = await server.getPrimaryService(SERVICE_UUID);
+        const service = await bluetoothServer.getPrimaryService(SERVICE_UUID);
         console.log('Servicio encontrado');
         
         bluetoothCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
         console.log('Característica encontrada');
 
-        // Habilitar notificaciones
         await bluetoothCharacteristic.startNotifications();
         bluetoothCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
         console.log('Notificaciones habilitadas');
-        
-        startGameBtn.style.display = 'block';
     } catch (error) {
         console.error('Error al conectar:', error);
         throw error;
@@ -90,7 +83,6 @@ function handleCharacteristicValueChanged(event) {
     const value = new TextDecoder().decode(event.target.value);
     console.log('Valor recibido:', value);
     // Aquí puedes manejar los mensajes recibidos del otro jugador
-    // Por ejemplo, actualizar el estado del juego, mover fichas, etc.
 }
 
 // Función para enviar datos al otro jugador
@@ -107,9 +99,7 @@ async function sendData(data) {
 startGameBtn.addEventListener('click', () => {
     waitingRoom.style.display = 'none';
     gameScreen.style.display = 'block';
-    // Aquí puedes inicializar el estado del juego y enviar un mensaje al otro jugador
     sendData('game_start');
 });
 
-// Aquí puedes añadir más funciones para manejar la lógica del juego,
-// como colocar fichas, manejar turnos, etc.
+// Aquí puedes añadir más funciones para manejar la lógica del juego
