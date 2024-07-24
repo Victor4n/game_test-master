@@ -6,7 +6,6 @@ let gameId;
 
 // Elementos del DOM
 const createGameBtn = document.getElementById('create-game');
-const joinGameContainer = document.getElementById('join-game-container');
 const joinGameBtn = document.getElementById('join-game');
 const gameIdInput = document.getElementById('game-id-input');
 const setupScreen = document.getElementById('setup-screen');
@@ -61,11 +60,6 @@ createGameBtn.addEventListener('click', () => {
         gameIdDisplay.textContent = gameId;
         connectionStatus.textContent = 'Esperando que el otro jugador se conecte...';
     });
-});
-
-// Mostrar opción para unirse al juego
-createGameBtn.addEventListener('click', () => {
-    joinGameContainer.style.display = 'block';
 });
 
 // Unirse a juego (Cliente)
@@ -123,7 +117,6 @@ function resetGame() {
     setupScreen.style.display = 'block';
     waitingRoom.style.display = 'none';
     gameScreen.style.display = 'none';
-    joinGameContainer.style.display = 'none';
     isHost = false;
     if (conn) {
         conn.close();
