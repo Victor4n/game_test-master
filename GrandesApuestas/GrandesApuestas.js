@@ -36,6 +36,7 @@ function initializePeerConnection() {
     });
 
     peer.on('connection', (connection) => {
+        console.log('Nueva conexión recibida');
         conn = connection;
         setupConnectionListeners();
     });
@@ -53,6 +54,9 @@ function setupConnectionListeners() {
         connectionStatus.textContent = 'Conectado. Listo para jugar.';
         if (isHost) {
             startGameBtn.style.display = 'block';
+        } else {
+            console.log('Enviando mensaje playerJoined');
+            conn.send({type: 'playerJoined'});
         }
     });
 
@@ -62,8 +66,8 @@ function setupConnectionListeners() {
     });
 
     conn.on('close', () => {
-        alert('Conexión cerrada. El otro jugador se ha desconectado.');
-        resetGame();
+        console.log('Conexión cerrada');
+        handleDisconnection();
     });
 }
 
@@ -86,9 +90,6 @@ joinGameByCodeBtn.addEventListener('click', () => {
     gameId = code;
     isHost = false;
     initializePeerConnection();
-    setupScreen.style.display = 'none';
-    waitingRoom.style.display = 'block';
-    connectionStatus.textContent = 'Conectando al anfitrión...';
     connectToPeer(gameId);
 });
 
@@ -106,9 +107,6 @@ joinGameBtn.addEventListener('click', () => {
     gameId = selectedGame.value;
     isHost = false;
     initializePeerConnection();
-    setupScreen.style.display = 'none';
-    waitingRoom.style.display = 'block';
-    connectionStatus.textContent = 'Conectando al anfitrión...';
     connectToPeer(gameId);
 });
 
@@ -119,15 +117,20 @@ function generateGameId() {
 
 // Conectar a un peer
 function connectToPeer(peerId) {
+    console.log('Intentando conectar a:', peerId);
     conn = peer.connect(peerId);
     setupConnectionListeners();
+    setupScreen.style.display = 'none';
+    waitingRoom.style.display = 'block';
+    connectionStatus.textContent = 'Conectando al anfitrión...';
 }
 
 // Broadcast del juego
 function broadcastGame() {
     broadcastChannel.postMessage({
         type: 'new-game',
-        gameId: gameId
+        gameId: gameId,
+        peerId: peer.id
     });
 }
 
@@ -145,7 +148,7 @@ function updateAvailableGamesList() {
         const radio = document.createElement('input');
         radio.type = 'radio';
         radio.name = 'available-game';
-        radio.value = id;
+        radio.value = game.peerId;
         radio.id = `game-${id}`;
         const label = document.createElement('label');
         label.htmlFor = `game-${id}`;
@@ -158,11 +161,18 @@ function updateAvailableGamesList() {
 
 // Manejar datos del juego
 function handleGameData(data) {
+    console.log('Manejando datos del juego:', data);
     switch (data.type) {
         case 'gameStart':
-            waitingRoom.style.display = 'none';
-            gameScreen.style.display = 'block';
+            console.log('Recibida señal de inicio de juego');
             startGame();
+            break;
+        case 'playerJoined':
+            console.log('Jugador se ha unido');
+            if (isHost) {
+                connectionStatus.textContent = 'Jugador conectado. Puedes iniciar el juego.';
+                startGameBtn.disabled = false;
+            }
             break;
         // Añade más casos según sea necesario para tu lógica de juego
     }
@@ -170,15 +180,19 @@ function handleGameData(data) {
 
 // Iniciar el juego
 function startGame() {
-    console.log('El juego ha comenzado');
+    console.log('Iniciando el juego');
     if (isHost) {
+        console.log('Anfitrión enviando señal de inicio de juego');
         conn.send({type: 'gameStart'});
     }
+    waitingRoom.style.display = 'none';
+    gameScreen.style.display = 'block';
     // Implementa aquí la lógica inicial del juego
 }
 
 // Reiniciar el juego
 function resetGame() {
+    console.log('Reiniciando el juego');
     setupScreen.style.display = 'block';
     waitingRoom.style.display = 'none';
     gameScreen.style.display = 'none';
@@ -189,22 +203,34 @@ function resetGame() {
     if (peer) {
         peer.destroy();
     }
+    availableGames.clear();
+    updateAvailableGamesList();
+}
+
+// Manejar desconexión
+function handleDisconnection() {
+    console.log('Manejando desconexión');
+    alert('El otro jugador se ha desconectado. La partida ha terminado.');
+    resetGame();
 }
 
 // Manejo de mensajes de Broadcast Channel
 broadcastChannel.onmessage = (event) => {
     const message = event.data;
+    console.log('Mensaje recibido en Broadcast Channel:', message);
     switch (message.type) {
         case 'new-game':
             if (!isHost) {
-                availableGames.set(message.gameId, {timestamp: Date.now()});
+                availableGames.set(message.gameId, {peerId: message.peerId, timestamp: Date.now()});
+                updateAvailableGamesList();
             }
             break;
         case 'request-games':
             if (isHost) {
                 broadcastChannel.postMessage({
                     type: 'new-game',
-                    gameId: gameId
+                    gameId: gameId,
+                    peerId: peer.id
                 });
             }
             break;
@@ -217,10 +243,15 @@ const availableGames = new Map();
 // Limpiar juegos antiguos periódicamente
 setInterval(() => {
     const now = Date.now();
+    let updated = false;
     for (let [id, game] of availableGames) {
         if (now - game.timestamp > 60000) { // 1 minuto
             availableGames.delete(id);
+            updated = true;
         }
+    }
+    if (updated) {
+        updateAvailableGamesList();
     }
 }, 30000); // Cada 30 segundos
 
@@ -229,7 +260,15 @@ requestAvailableGames();
 
 // Iniciar el juego (para el host)
 startGameBtn.addEventListener('click', () => {
+    console.log('Botón de inicio de juego presionado');
     if (isHost && conn) {
         startGame();
+    }
+});
+
+// Evento para manejar el cierre de la ventana o pestaña
+window.addEventListener('beforeunload', () => {
+    if (conn) {
+        conn.send({type: 'playerDisconnected'});
     }
 });
